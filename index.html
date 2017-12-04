@@ -1,22 +1,30 @@
+<!DOCTYPE html>
 <html>
-<head>
-<title>Missile Command Game</title>
-<style>
-body{
-	margin:0;
-	overflow: hidden;
-}
-canvas{
-	background: red;
-}
-</style>
-</head>
-<body>
-<canvas id="myCanvas" width="512" height="512"></canvas>
-<script src="src/three.js"></script>
-<script src="src/three.min.js"></script>
-<script src="renderer.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Prog 3: Rasterization Shell</title>
+    
+    <link type="text/css" rel="stylesheet" href="rasterize.css">
 
+    <script type="text/javascript" src="gl-matrix.js"></script>
+    <script type="text/javascript" src="rasterize_game.js"></script>
+  </head>
 
+  <body onload="main();">
+    <canvas id="myImageCanvas" width="512" height="512"></canvas>
+    <canvas id="myWebGLCanvas" width="512" height="512"></canvas>
+    <p>
+    <br>
+    <span id="light">
+    <!--
+    <label ><b>Use Lighting</b></label>
+    <input type="checkbox" name="use_light" value="0" id="use_light">
+    <br>
+    <input type="button" id="Submitbtn" name="Submit" value="Submit" onclick="main();">
+    <br>
+    -->
+    </span>
+    <br>
+    </p>
+  </body>
 </html>
