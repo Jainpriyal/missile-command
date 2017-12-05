@@ -2,7 +2,7 @@
 
 /* assignment specific globals */
 const INPUT_TRIANGLES_URL = "https://ncsucgclass.github.io/prog3/triangles.json"; // triangles file loc
-var defaultEye = vec3.fromValues(0.5,0.5,-0.5); // default eye position in world space
+var defaultEye = vec3.fromValues(0.5,0.5,-1); // default eye position in world space
 var defaultCenter = vec3.fromValues(0.5,0.5,0.5); // default view direction in world space
 var defaultUp = vec3.fromValues(0,1,0); // default view up vector
 var lightAmbient = vec3.fromValues(1,1,1); // default light ambient emission
@@ -52,7 +52,7 @@ var use_light;
 var toggle_Texture = 0; //maximum value is 2
 
 var terrain;
-
+var city1;
 // ASSIGNMENT HELPER FUNCTIONS
 
 
@@ -269,6 +269,7 @@ function setupWebGL() {
          //gl.clearColor(0.0, 0.0, 0.0, 1.0); // use black when we clear the frame buffer
          gl.clearDepth(1.0); // use max when we clear the depth buffer
          gl.enable(gl.DEPTH_TEST); // use hidden surface removal (with zbuffering)
+         gl.depthMask(true)
        }
      } // end try
      
@@ -285,6 +286,10 @@ function loadModels() {
     //load terrain
     terrain = new Terrain(gl);
     terrain.load_model();
+
+    city1 = new City(gl);
+    city1.load_city();
+
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -500,7 +505,7 @@ function renderModels() {
        // currSet = inputTriangles[whichTriSet];
         
         // make model transform, add to view project
-        makeModelTransform(terrain);
+       // makeModelTransform(terrain);
 
         mat4.multiply(pvmMatrix,pvMatrix,mMatrix); // project * view * model
         gl.uniformMatrix4fv(mMatrixULoc, false, mMatrix); // pass in the m matrix
@@ -532,6 +537,44 @@ function renderModels() {
         // triangle buffer: activate and render
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terrain.triangleBuffers); // activate
         gl.drawElements(gl.TRIANGLES,3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+
+
+        //makeModelTransform(city1);
+
+        mat4.multiply(pvmMatrix,pvMatrix,city1.modelMatrix); // project * view * model
+        gl.uniformMatrix4fv(mMatrixULoc, false, city1.modelMatrix); // pass in the m matrix
+        gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+        
+        // reflectivity: feed to the fragment shader
+        gl.uniform3fv(ambientULoc,city1.material.ambient); // pass in the ambient reflectivity
+        gl.uniform3fv(diffuseULoc,city1.material.diffuse); // pass in the diffuse reflectivity
+        gl.uniform3fv(specularULoc,city1.material.specular); // pass in the specular reflectivity
+        gl.uniform1f(shininessULoc,city1.material.n); // pass in the specular exponent
+
+        gl.uniform1f(alphaULoc,city1.material.alpha); //alpha location
+
+        // vertex buffer: activate and feed into vertex shader
+        gl.bindBuffer(gl.ARRAY_BUFFER,city1.vertexBuffers); // activate
+        gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+        gl.bindBuffer(gl.ARRAY_BUFFER,city1.normalBuffers); // activate
+        gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+        //uv buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, city1.textureBuffers);
+        gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+        //bind texture
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, city1.triangleTexture);
+        gl.uniform1i(samplerUniform, 0);
+
+        // triangle buffer: activate and render
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, city1.triangleBuffers); // activate
+        //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+
+gl.drawElements(gl.TRIANGLES, 36,gl.UNSIGNED_SHORT,0); // render
+
+
         
    // } // end for each triangle set
 } // end render model
