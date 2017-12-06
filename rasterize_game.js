@@ -274,6 +274,13 @@ function setupWebGL() {
      } // end catch
 } // end setupWebGL
 
+
+function generateRandomValue(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 // read models in, load them into webgl buffers
 function loadModels() {
     var maxCorner = vec3.fromValues(-10, -10, -10); // bbox corner
@@ -335,10 +342,155 @@ function loadModels() {
     scenes.push(city5);
     scenes.push(city6);
 
+    launch_missile();
+
+    // sky_missile = new SkyMissile(gl);
+    // sky_missile.load_missile(4, 4, 4);
+    // //animate(sky_missile.end) //end in class
+    // scenes.push(sky_missile);
+    // dest = vec3.fromValues(-5,-5,4);
+    // src = vec3.fromValues(45,45,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile.animate_missile(src,dest,5,5);
+
+    // sky_missile1 = new SkyMissile(gl);
+    // sky_missile1.load_missile(4, 4, 4);
+    // //animate(sky_missile.end) //end in class
+    // scenes.push(sky_missile1);
+    // dest = vec3.fromValues(5,-5,4);
+    // src = vec3.fromValues(10,40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile1.animate_missile(src,dest,1,1);
+
+    // sky_missile = new SkyMissile(gl);
+    // sky_missile.load_missile(4, 4, 4);
+    // //animate(sky_missile.end) //end in class
+    // scenes.push(sky_missile);
+    // dest = vec3.fromValues(-3,-3,4);
+    // src = vec3.fromValues(40,40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile.animate_missile(src,dest,1,1);
+
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
 
 } // end load models
+
+function launch_missile()
+{
+
+    destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
+    //destinations= [3];
+
+
+    //missile one
+    // sky_missile1 = new SkyMissile(gl);
+    // sky_missile1.load_missile(4, 4, 4);
+    // scenes.push(sky_missile1);
+    // dest = vec3.fromValues(-5,-6,4);
+    // src = vec3.fromValues(45,45,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile1.animate_missile(src,dest,5,5);
+
+    // for(var i=0; i<2; i++)
+    // {
+    //     sky_missile1 = new SkyMissile(gl);
+    //     sky_missile1.load_missile(4, 4, 4);
+    //     scenes.push(sky_missile1);
+    //     val12 = destinations[Math.floor(Math.random()*destinations.length)];
+    //     console.log("*************** valll"+ val12);
+    //     dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)]*10, -3,4);
+    //     src= vec3.fromValues(generateRandomValue(-100, 150), 40, 4);
+    //     sky_missile1.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
+    // }
+
+    //missile source 70 -80
+    //missile destination 70 -80
+    for(var i=0; i<4; i++){
+        sky_missile2 = new SkyMissile(gl);
+        sky_missile2.load_missile(4, 4, 4);
+        scenes.push(sky_missile2);
+        val12 = destinations[Math.floor(Math.random()*destinations.length)];
+        dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
+        src= vec3.fromValues(generateRandomValue(-80,70), 40, 4);
+       // dest = vec3.fromValues(70, -3, 4);
+        //src= vec3.fromValues(-80, 80, 4);
+        sky_missile2.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
+    }
+
+        // sky_missile3 = new SkyMissile(gl);
+        // sky_missile3.load_missile(4, 4, 4);
+        // scenes.push(sky_missile3);
+        // val12 = destinations[Math.floor(Math.random()*destinations.length)];
+        // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)]*10, -3,4);
+        // src= vec3.fromValues(generateRandomValue(-50,50), 40, 4);
+        // sky_missile3.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
+
+
+
+    // //missile two
+    // sky_missile2 = new SkyMissile(gl);
+    // sky_missile2.load_missile(4, 4, 4);
+    // scenes.push(sky_missile2);
+    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
+    // src= vec3.fromValues(generateRandomValue(0,50), 40, 4);
+    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile2.animate_missile(src,dest, (src[0]-dest[0])/20, (src[1]-dest[1])/20);
+
+
+    //     //missile three
+    // sky_missile3 = new SkyMissile(gl);
+    // sky_missile3.load_missile(4, 4, 4);
+    // scenes.push(sky_missile3);
+    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
+    // src= vec3.fromValues(generateRandomValue(50,100), 40, 4);
+    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile3.animate_missile(src,dest, (src[0]-dest[0])/40, (src[1]-dest[1])/40);
+
+    //     //missile four
+    // sky_missile4 = new SkyMissile(gl);
+    // sky_missile4.load_missile(4, 4, 4);
+    // scenes.push(sky_missile4);
+    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
+    // src= vec3.fromValues(generateRandomValue(150,180), 40, 4);
+    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile4.animate_missile(src,dest, (src[0]-dest[0])/13, (src[1]-dest[1])/13);
+
+    
+        //missile five
+    // sky_missile5 = new SkyMissile(gl);
+    // sky_missile5.load_missile(4, 4, 4);
+    // scenes.push(sky_missile5);
+    // //dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
+    // dest = vec3.fromValues(-5, -2.5, 4);
+    // //src= vec3.fromValues(generateRandomValue(-10,23), 40, 4);
+    // src = vec3.fromValues(230, 40, 4);
+    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile5.animate_missile(src,dest, (src[0]-dest[0])/30, (src[1]-dest[1])/30);
+
+    // //     //missile six
+    // sky_missile6 = new SkyMissile(gl);
+    // sky_missile6.load_missile(4, 4, 4);
+    // scenes.push(sky_missile6);
+    // dest = vec3.fromValues(0,-6,4);
+    // src = vec3.fromValues(50,40,4);
+    // console.log("************** values: ****" + dest[0] + " " + src[0]);
+    // sky_missile6.animate_missile(src,dest,5,5);
+
+    setTimeout(launch_missile, 3000);
+}
+
+// animate_missile()
+// {
+
+//     setTimeout(animate_missile, 3000);
+//     sky_missile.modelMatrix //translate this
+// }
+
 
 // setup the webGL shaders
 function setupShaders() {
@@ -519,7 +671,7 @@ function renderModels() {
     //for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) {
        // currSet = inputTriangles[whichTriSet];
 
-    console.log("*********** scene size: " + scenes.length);
+ //   console.log("*********** scene size: " + scenes.length);
     for (var iter=0; iter<scenes.length; iter++)
     {
         currscene = scenes[iter];
@@ -629,6 +781,7 @@ function renderModels() {
 } // end render model
 
 
+
 /* MAIN -- HERE is where execution begins after window load */
 
 function main() {
@@ -638,6 +791,5 @@ function main() {
   setupWebGL(); // set up the webGL environment
   loadModels(); // load in the models from tri file
   setupShaders(); // setup the webGL shaders
-  renderModels(); // draw the triangles using webGL
-  
+  renderModels(); // draw the triangles using webGL  
 } // end main
