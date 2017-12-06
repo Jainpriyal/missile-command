@@ -18,10 +18,10 @@ var numTriangleSets = 0; // how many triangle sets in input scene
 
 //var vertexBuffers = []; // this contains vertex coordinate lists by set, in triples
 //var normalBuffers = []; // this contains normal component lists by set, in triples
-var triSetSizes = []; // this contains the size of each triangle set
-var triangleBuffers = []; // lists of indices into vertexBuffers by set, in triples
+//var triSetSizes = []; // this contains the size of each triangle set
+//var triangleBuffers = []; // lists of indices into vertexBuffers by set, in triples
 
-var textureBuffers = []; 
+//var textureBuffers = []; 
 var samplerUniform;
 var uvTextureLoc;
 var uniToggleTexture =0;
@@ -37,9 +37,6 @@ var shininessULoc; // where to put specular exponent for fragment shader
 
 var alphaULoc; //location of alpha 
 var useTextureLoc //use texture
-//buffer to store transparent and opaque objects
-var opaqueBuffer = [];
-var transBuffer = [];
 
 /* interaction variables */
 var Eye = vec3.clone(defaultEye); // eye position in world space
@@ -51,8 +48,7 @@ var viewDelta = 0; // how much to displace view with each key press
 var use_light;
 var toggle_Texture = 0; //maximum value is 2
 
-var terrain;
-var city1;
+var scenes = [];
 // ASSIGNMENT HELPER FUNCTIONS
 
 
@@ -284,12 +280,60 @@ function loadModels() {
     var minCorner = vec3.fromValues(10, 10, 10); // other corner
 
     //load terrain
-    terrain = new Terrain(gl);
+    var terrain = new Terrain(gl);
     terrain.load_model();
 
-    city1 = new City(gl);
-    city1.load_city();
+    //load cities
+    var city1 = new City(gl);
+    city1.load_city(-5, -2.5, 4);
 
+    var city2 = new City(gl);
+    city2.load_city(-1, -2.5, 4);
+
+    var city3 = new City(gl);
+    city3.load_city(3, -2.5, 4);
+
+    var city4 = new City(gl);
+    city4.load_city(9.5, -2.5, 4);
+
+    var city5 = new City(gl);
+    city5.load_city(13, -2.5, 4);
+
+    var city6 = new City(gl);
+    city6.load_city(17, -2.5, 4);
+
+    // var missile1 = new Missile(gl);
+    // missile1.load_missile(-10, 0.8, 4);
+
+    // var missile2 = new Missile(gl);
+    // missile2.load_missile(7, 0.8, 4);
+
+    // var missile3 = new Missile(gl);
+    // missile3.load_missile(23, 0.8, 4);
+
+
+    //load missile
+    var missile1 = new Missile(gl);
+    missile1.load_missile(-10, -0.8, 4);
+
+    var missile2 = new Missile(gl);
+    missile2.load_missile(7, -0.8, 4);
+
+    var missile3 = new Missile(gl);
+    missile3.load_missile(23, -0.8, 4);
+
+    scenes.push(terrain);
+    scenes.push(missile1);
+    scenes.push(missile2);
+    scenes.push(missile3);
+    
+    scenes.push(city1);
+    scenes.push(city2);
+    scenes.push(city3);
+
+    scenes.push(city4);
+    scenes.push(city5);
+    scenes.push(city6);
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -453,35 +497,6 @@ function setupShaders() {
 // render the loaded model
 function renderModels() {
     
-    // construct the model transform matrix, based on model state
-    function makeModelTransform(currModel) {
-        var zAxis = vec3.create(), sumRotation = mat4.create(), temp = mat4.create(), negCtr = vec3.create();
-
-        // move the model to the origin
-        mat4.fromTranslation(mMatrix,vec3.negate(negCtr,currModel.center)); 
-        
-        // scale for highlighting if needed
-        if (currModel.on)
-            mat4.multiply(mMatrix,mat4.fromScaling(temp,vec3.fromValues(1.2,1.2,1.2)),mMatrix); // S(1.2) * T(-ctr)
-        
-        // rotate the model to current interactive orientation
-        vec3.normalize(zAxis,vec3.cross(zAxis,currModel.xAxis,currModel.yAxis)); // get the new model z axis
-        mat4.set(sumRotation, // get the composite rotation
-            currModel.xAxis[0], currModel.yAxis[0], zAxis[0], 0,
-            currModel.xAxis[1], currModel.yAxis[1], zAxis[1], 0,
-            currModel.xAxis[2], currModel.yAxis[2], zAxis[2], 0,
-            0, 0,  0, 1);
-        mat4.multiply(mMatrix,sumRotation,mMatrix); // R(ax) * S(1.2) * T(-ctr)
-        
-        // translate back to model center
-        mat4.multiply(mMatrix,mat4.fromTranslation(temp,currModel.center),mMatrix); // T(ctr) * R(ax) * S(1.2) * T(-ctr)
-
-        // translate model to current interactive orientation
-        mat4.multiply(mMatrix,mat4.fromTranslation(temp,currModel.translation),mMatrix); // T(pos)*T(ctr)*R(ax)*S(1.2)*T(-ctr)
-        
-    } // end make model transform
-    
-    // var hMatrix = mat4.create(); // handedness matrix
     var pMatrix = mat4.create(); // projection matrix
     var vMatrix = mat4.create(); // view matrix
     var mMatrix = mat4.create(); // model matrix
@@ -503,79 +518,113 @@ function renderModels() {
     //var currSet; // the tri set and its material properties
     //for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) {
        // currSet = inputTriangles[whichTriSet];
-        
-        // make model transform, add to view project
-       // makeModelTransform(terrain);
 
-        mat4.multiply(pvmMatrix,pvMatrix,mMatrix); // project * view * model
-        gl.uniformMatrix4fv(mMatrixULoc, false, mMatrix); // pass in the m matrix
+    console.log("*********** scene size: " + scenes.length);
+    for (var iter=0; iter<scenes.length; iter++)
+    {
+        currscene = scenes[iter];
+        mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+        gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
         gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
         
         // reflectivity: feed to the fragment shader
-        gl.uniform3fv(ambientULoc,terrain.material.ambient); // pass in the ambient reflectivity
-        gl.uniform3fv(diffuseULoc,terrain.material.diffuse); // pass in the diffuse reflectivity
-        gl.uniform3fv(specularULoc,terrain.material.specular); // pass in the specular reflectivity
-        gl.uniform1f(shininessULoc,terrain.material.n); // pass in the specular exponent
+        gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+        gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+        gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+        gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
 
-        gl.uniform1f(alphaULoc,terrain.material.alpha); //alpha location
+        gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
 
         // vertex buffer: activate and feed into vertex shader
-        gl.bindBuffer(gl.ARRAY_BUFFER,terrain.vertexBuffers); // activate
+        gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
         gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
-        gl.bindBuffer(gl.ARRAY_BUFFER,terrain.normalBuffers); // activate
+        gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
         gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
 
         //uv buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, terrain.textureBuffers);
+        gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
         gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
 
         //bind texture
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, terrain.triangleTexture);
+        gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
         gl.uniform1i(samplerUniform, 0);
 
         // triangle buffer: activate and render
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terrain.triangleBuffers); // activate
-        gl.drawElements(gl.TRIANGLES,3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
-
-
-        //makeModelTransform(city1);
-
-        mat4.multiply(pvmMatrix,pvMatrix,city1.modelMatrix); // project * view * model
-        gl.uniformMatrix4fv(mMatrixULoc, false, city1.modelMatrix); // pass in the m matrix
-        gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
-        
-        // reflectivity: feed to the fragment shader
-        gl.uniform3fv(ambientULoc,city1.material.ambient); // pass in the ambient reflectivity
-        gl.uniform3fv(diffuseULoc,city1.material.diffuse); // pass in the diffuse reflectivity
-        gl.uniform3fv(specularULoc,city1.material.specular); // pass in the specular reflectivity
-        gl.uniform1f(shininessULoc,city1.material.n); // pass in the specular exponent
-
-        gl.uniform1f(alphaULoc,city1.material.alpha); //alpha location
-
-        // vertex buffer: activate and feed into vertex shader
-        gl.bindBuffer(gl.ARRAY_BUFFER,city1.vertexBuffers); // activate
-        gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
-        gl.bindBuffer(gl.ARRAY_BUFFER,city1.normalBuffers); // activate
-        gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
-
-        //uv buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, city1.textureBuffers);
-        gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
-
-        //bind texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, city1.triangleTexture);
-        gl.uniform1i(samplerUniform, 0);
-
-        // triangle buffer: activate and render
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, city1.triangleBuffers); // activate
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
         //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+        gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+    }
 
-gl.drawElements(gl.TRIANGLES, 36,gl.UNSIGNED_SHORT,0); // render
+//         // make model transform, add to view project
+//        // makeModelTransform(terrain);
 
-
+//         mat4.multiply(pvmMatrix,pvMatrix,mMatrix); // project * view * model
+//         gl.uniformMatrix4fv(mMatrixULoc, false, mMatrix); // pass in the m matrix
+//         gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
         
+//         // reflectivity: feed to the fragment shader
+//         gl.uniform3fv(ambientULoc,terrain.material.ambient); // pass in the ambient reflectivity
+//         gl.uniform3fv(diffuseULoc,terrain.material.diffuse); // pass in the diffuse reflectivity
+//         gl.uniform3fv(specularULoc,terrain.material.specular); // pass in the specular reflectivity
+//         gl.uniform1f(shininessULoc,terrain.material.n); // pass in the specular exponent
+
+//         gl.uniform1f(alphaULoc,terrain.material.alpha); //alpha location
+
+//         // vertex buffer: activate and feed into vertex shader
+//         gl.bindBuffer(gl.ARRAY_BUFFER,terrain.vertexBuffers); // activate
+//         gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+//         gl.bindBuffer(gl.ARRAY_BUFFER,terrain.normalBuffers); // activate
+//         gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+//         //uv buffer
+//         gl.bindBuffer(gl.ARRAY_BUFFER, terrain.textureBuffers);
+//         gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+//         //bind texture
+//         gl.activeTexture(gl.TEXTURE0);
+//         gl.bindTexture(gl.TEXTURE_2D, terrain.triangleTexture);
+//         gl.uniform1i(samplerUniform, 0);
+
+//         // triangle buffer: activate and render
+//         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terrain.triangleBuffers); // activate
+//         gl.drawElements(gl.TRIANGLES,3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+
+
+//         //makeModelTransform(city1);
+
+//         mat4.multiply(pvmMatrix,pvMatrix,city1.modelMatrix); // project * view * model
+//         gl.uniformMatrix4fv(mMatrixULoc, false, city1.modelMatrix); // pass in the m matrix
+//         gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+        
+//         // reflectivity: feed to the fragment shader
+//         gl.uniform3fv(ambientULoc,city1.material.ambient); // pass in the ambient reflectivity
+//         gl.uniform3fv(diffuseULoc,city1.material.diffuse); // pass in the diffuse reflectivity
+//         gl.uniform3fv(specularULoc,city1.material.specular); // pass in the specular reflectivity
+//         gl.uniform1f(shininessULoc,city1.material.n); // pass in the specular exponent
+
+//         gl.uniform1f(alphaULoc,city1.material.alpha); //alpha location
+
+//         // vertex buffer: activate and feed into vertex shader
+//         gl.bindBuffer(gl.ARRAY_BUFFER,city1.vertexBuffers); // activate
+//         gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+//         gl.bindBuffer(gl.ARRAY_BUFFER,city1.normalBuffers); // activate
+//         gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+//         //uv buffer
+//         gl.bindBuffer(gl.ARRAY_BUFFER, city1.textureBuffers);
+//         gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+//         //bind texture
+//         gl.activeTexture(gl.TEXTURE0);
+//         gl.bindTexture(gl.TEXTURE_2D, city1.triangleTexture);
+//         gl.uniform1i(samplerUniform, 0);
+
+//         // triangle buffer: activate and render
+//         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, city1.triangleBuffers); // activate
+//         //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+
+// gl.drawElements(gl.TRIANGLES, 36,gl.UNSIGNED_SHORT,0); // render       
    // } // end for each triangle set
 } // end render model
 

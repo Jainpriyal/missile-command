@@ -1,4 +1,4 @@
-class Terrain {
+class Missile {
 
 	constructor(gl){
 		this.gl = gl;
@@ -9,11 +9,40 @@ class Terrain {
 		this.xAxis = vec3.fromValues(1,0,0);
 		this.yAxis = vec3.fromValues(0,1,0);
 
-		this.material = {"ambient": [1,1,1], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "grass.jpg"};
-		this.vertices = [[-5, -0.5, 0.8],[-5, -0.5, -0.8],[5,-0.5,-0.8],[5,-0.5,0.8]];
-		this.normals = [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1]];
-		this.uvs = [[0,0], [0,1], [1,1], [1,0]];
-		this.triangles = [[0,1,2],[2,3,0]];
+		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 0.6, "texture": "grass.jpg"};
+		this.vertices = [[-1,1,0.5], [1,1,0.5], [1,-0.8,0.5], [-1,-0.8,0.5], [1,1,-0.5], [-1,1,-0.5], [1,-0.8,-0.5], [-1,-0.8,-0.5]];
+		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
+
+		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
+		this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
+		//this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [0.8,0.9], [0,0], [0.8, 0]];
+		this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [1,1], [0,0], [1, 0]];
+
+		this.triangles = [[0,1,2],[0,2,3], 
+						  [7,6,2], [7,2,3], 
+						  [5,4,6], [5,6,7], 
+						  [5,4,1],[5,1,0],
+						  [5,0,3], [5,3,7],
+						  [4,1,2],[4,1,6]];
+
+		// this.vertices=[[-0.5,-0.5,-0.5],[0.5,-0.5,-0.5],[0.5,-0.5,0.5],[-0.5,-0.5,0.5],
+  //           [-0.5,0.5,-0.5],[0.5,0.5,-0.5],[0.5,0.5,0.5],[-0.5,0.5,0.5],
+  //           [-0.5,0.51,-0.5],[0.5,0.51,-0.5],[0.5,0.51,0.5],[-0.5,0.51,0.5]];
+
+  //           this.normals=[[0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
+  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
+  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1]];
+
+  //           this.uvs=[[1,0], [0.76,0], [1,0], [0.76,0],
+  //           [1,0.48], [0.76,0.48], [1,0.48], [0.76,0.48],
+  //           [1,0], [0.76,0], [0.76,0.48], [1,0.48]];
+
+  //           this.triangles=[[0,1,4],[4,5,1],
+  //           [1,2,5],[5,6,2],
+  //           [2,3,6],[6,7,3],
+  //           [3,0,7],[4,7,0],
+  //           [4,5,6],[6,7,4],
+  //           [8,9,11],[11,10,9]];
 
 		this.modelMatrix = mat4.create();
 	}
@@ -29,7 +58,7 @@ class Terrain {
 	        self.handleTexture();
 	    }
 	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
-	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/grass.jpg";
+	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/missile_transparent.png";
 	}
 
 	//function to handle loaded texture
@@ -56,7 +85,7 @@ class Terrain {
     	return (value & (value - 1)) == 0;
 	}
 
-load_model(){
+load_missile(x, y, z){
   	var vtxToAdd; // vtx coords to add to the coord array
   	var normToAdd; // vtx normal to add to the coord array
   	var uvToAdd; // uv coords to add to the uv arry
@@ -72,7 +101,18 @@ load_model(){
   	this.vertexBuffers = this.gl.createBuffer();
   	this.normalBuffers = this.gl.createBuffer();
   	this.textureBuffers = this.gl.createBuffer();
-  	this.triangleBuffers = this.gl.createBuffer(); // init empty triangle index buffer	
+  	this.triangleBuffers = this.gl.createBuffer(); // init empty triangle index buffer
+  	this.triSetSizes =0;
+
+  	//scale the city
+  	var temp = mat4.create();
+  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.08,0.25,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
+
+  	//translate city
+  	var translation = vec3.create();
+	//vec3.set (translation, -7, 0.8, 4);
+	vec3.set (translation, x, y, z);
+	mat4.translate (this.modelMatrix, this.modelMatrix, translation);
 
     var numVerts = this.vertices.length; 
   	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
@@ -105,6 +145,8 @@ load_model(){
     this.gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glUVs), gl.STATIC_DRAW);
     
     this.triSetSizes = this.triangles.length; // number of tris in this set
+    console.log("************** trisetsized: " + this.triSetSizes);
+
     for (whichSetTri=0; whichSetTri<this.triSetSizes; whichSetTri++) {
 		triToAdd = this.triangles[whichSetTri]; // get tri to add
 		glTriangles.push(triToAdd[0],triToAdd[1],triToAdd[2]); // put indices in set list
