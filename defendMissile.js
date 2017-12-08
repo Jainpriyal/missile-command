@@ -1,4 +1,4 @@
-class AttackMissile {
+class DefendMissile {
 
 	constructor(gl){
 		this.gl = gl;
@@ -146,47 +146,6 @@ class AttackMissile {
 	} // end for each triangle set 
 
 
-	//add destination also
-   	animate_missile(add_x, add_y, scene, explode_list)
-   	{
-   		//animate missile only destroy city or missile launcher
-   		this.modelMatrix = mat4.create();
-   		var temp = mat4.create();
-  		mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.02,0.035,0.02)),this.modelMatrix); // S(1.2) * T(-ctr)
-
-  		this.x = this.x - add_x;
-  		this.y = this.y - add_y;
-
-		var missileAudio = document.createElement('audio');
-	    var audio_source = document.createElement('source');
-	    audio_source.src = "/Users/pjain12/Downloads/squash.wav";
-	    missileAudio.appendChild(audio_source);
-
-   		var translation = vec3.create();
-
-   		//vec3.set (translation, src[0], src[1], 4);
-   		vec3.set (translation, this.x, this.y, this.z);
-  		//console.log("translation:" + translation);
-   		mat4.translate(this.modelMatrix, this.modelMatrix, translation);
-   		var self = this;
-   		if(10*scene.x-10<=this.x<=10*scene.x+10 && 10*scene.y-10<=this.y<=10*scene.y+10)
-   		{
-   		console.log("********** destroyed objects: " + this.count);
-		    var explode = new Explosion(this.gl);
-   			explode.load_explosion(scene.x, scene.y, scene.z);
-   			explode_list.push(explode);
-		    missileAudio.play();
-		    console.log("********* playing audio **********");
-		    scene.visible = false;
-		    this.visible = false;
-
-   			return;
-   		}
-   		else{
-   			setTimeout(function(){self.animate_missile(add_x,add_y, scene,explode_list);}, 150);
-   		}
-   }
-
    //function for killing sky_missile
    //dont know the position of those missile
    animate_defend_missile(src, dest, add_x, add_y, attack_missile_list, explode_list)
@@ -213,8 +172,8 @@ class AttackMissile {
    			for(var attack_missile=0; attack_missile<attack_missile_list.length; attack_missile++)
    			{
    				if(10*attack_missile.x-10<=this.x<=10*attack_missile.x+10 && 10*attack_missile.y-10<=this.y<=10*attack_missile.y+10){
-   					attack_missile_list[attack_missile].visible = false;
    					this.visible = false;
+   					attack_missile_list[attack_missile].visible = false;
    					var explode = new Explosion(this.gl);
    					explode.load_explosion(dest[0], dest[1], dest[z]);
    					explode_list.push(explode);

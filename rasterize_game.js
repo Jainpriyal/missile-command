@@ -16,11 +16,6 @@ var gl = null; // the all powerful gl object. It's all here folks!
 var inputTriangles = []; // the triangle data as loaded from input files
 var numTriangleSets = 0; // how many triangle sets in input scene
 
-//var vertexBuffers = []; // this contains vertex coordinate lists by set, in triples
-//var normalBuffers = []; // this contains normal component lists by set, in triples
-//var triSetSizes = []; // this contains the size of each triangle set
-//var triangleBuffers = []; // lists of indices into vertexBuffers by set, in triples
-
 //var textureBuffers = []; 
 var samplerUniform;
 var uvTextureLoc;
@@ -35,6 +30,7 @@ var diffuseULoc; // where to put diffuse reflecivity for fragment shader
 var specularULoc; // where to put specular reflecivity for fragment shader
 var shininessULoc; // where to put specular exponent for fragment shader
 
+
 var alphaULoc; //location of alpha 
 var useTextureLoc //use texture
 
@@ -48,7 +44,14 @@ var viewDelta = 0; // how much to displace view with each key press
 var use_light;
 var toggle_Texture = 0; //maximum value is 2
 
-var scenes = [];
+var scenes = []; //total 9 scenes: 6cities and 3 missile launcher
+var attack_missile_list = []; // list of missiles coming to attack
+var defend_missile_list = []; //list of missiles send to defend
+
+var missile_list = [];
+var scene_terrain = [];
+
+var explode_list = [];
 // ASSIGNMENT HELPER FUNCTIONS
 
 
@@ -257,6 +260,8 @@ function setupWebGL() {
      webGLCanvas.width = window.innerWidth;
      webGLCanvas.height = window.innerHeight;
 
+     webGLCanvas.onmousedown = send_defend_missile;
+
      gl = webGLCanvas.getContext("webgl"); // get a webgl object from i
      try {
        if (gl == null) {
@@ -265,7 +270,16 @@ function setupWebGL() {
          //gl.clearColor(0.0, 0.0, 0.0, 1.0); // use black when we clear the frame buffer
          gl.clearDepth(1.0); // use max when we clear the depth buffer
          gl.enable(gl.DEPTH_TEST); // use hidden surface removal (with zbuffering)
-         gl.depthMask(true)
+         gl.depthMask(true);
+
+         //setup game start audio
+        var startAudio = document.createElement('audio');
+        var start_source = document.createElement('source');
+        //modification
+        //add game start audio
+        start_source.src = "/Users/pjain12/Downloads/gameOver.wav";
+        startAudio.appendChild(start_source);
+        startAudio.play();
        }
      } // end try
      
@@ -276,13 +290,22 @@ function setupWebGL() {
 
 
 function generateRandomValue(min, max) {
+  // min = Math.ceil(min);
+  // max = Math.floor(max);
+  // return Math.floor(Math.random() * (max - min)) + min;
+  return Math.random() * (max - min) + min;
+}
+
+function getRandomScene(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 // read models in, load them into webgl buffers
 function loadModels() {
+
+    //??? anything with max value min value doubt
     var maxCorner = vec3.fromValues(-10, -10, -10); // bbox corner
     var minCorner = vec3.fromValues(10, 10, 10); // other corner
 
@@ -309,31 +332,17 @@ function loadModels() {
     var city6 = new City(gl);
     city6.load_city(17, -2.5, 4);
 
-    // var missile1 = new Missile(gl);
-    // missile1.load_missile(-10, 0.8, 4);
+    //load missile launchers
+    var missile_launcher1 = new MissileLauncher(gl);
+    missile_launcher1.load_missile(-10, -0.8, 4);
 
-    // var missile2 = new Missile(gl);
-    // missile2.load_missile(7, 0.8, 4);
+    var missile_launcher2 = new MissileLauncher(gl);
+    missile_launcher2.load_missile(7, -0.8, 4);
 
-    // var missile3 = new Missile(gl);
-    // missile3.load_missile(23, 0.8, 4);
+    var missile_launcher3 = new MissileLauncher(gl);
+    missile_launcher3.load_missile(23, -0.8, 4);
 
-
-    //load missile
-    var missile1 = new Missile(gl);
-    missile1.load_missile(-10, -0.8, 4);
-
-    var missile2 = new Missile(gl);
-    missile2.load_missile(7, -0.8, 4);
-
-    var missile3 = new Missile(gl);
-    missile3.load_missile(23, -0.8, 4);
-
-    scenes.push(terrain);
-    scenes.push(missile1);
-    scenes.push(missile2);
-    scenes.push(missile3);
-    
+    scene_terrain.push(terrain);
     scenes.push(city1);
     scenes.push(city2);
     scenes.push(city3);
@@ -342,34 +351,13 @@ function loadModels() {
     scenes.push(city5);
     scenes.push(city6);
 
+    scenes.push(missile_launcher1);
+    scenes.push(missile_launcher2);
+    scenes.push(missile_launcher3);
+    
     launch_missile();
 
-    // sky_missile = new SkyMissile(gl);
-    // sky_missile.load_missile(4, 4, 4);
-    // //animate(sky_missile.end) //end in class
-    // scenes.push(sky_missile);
-    // dest = vec3.fromValues(-5,-5,4);
-    // src = vec3.fromValues(45,45,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile.animate_missile(src,dest,5,5);
-
-    // sky_missile1 = new SkyMissile(gl);
-    // sky_missile1.load_missile(4, 4, 4);
-    // //animate(sky_missile.end) //end in class
-    // scenes.push(sky_missile1);
-    // dest = vec3.fromValues(5,-5,4);
-    // src = vec3.fromValues(10,40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile1.animate_missile(src,dest,1,1);
-
-    // sky_missile = new SkyMissile(gl);
-    // sky_missile.load_missile(4, 4, 4);
-    // //animate(sky_missile.end) //end in class
-    // scenes.push(sky_missile);
-    // dest = vec3.fromValues(-3,-3,4);
-    // src = vec3.fromValues(40,40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile.animate_missile(src,dest,1,1);
+    launch_spaceship();
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -379,117 +367,67 @@ function loadModels() {
 function launch_missile()
 {
 
-    destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
-    //destinations= [3];
+    //add audio
+
+   //  var missileAudio = document.createElement('audio');
+   //  var audio_source = document.createElement('source');
+   //  audio_source.src = "/Users/pjain12/Downloads/gameOver.wav";
+   //  missileAudio.appendChild(audio_source);
+   // // missileAudio.play();
 
 
-    //missile one
-    // sky_missile1 = new SkyMissile(gl);
-    // sky_missile1.load_missile(4, 4, 4);
-    // scenes.push(sky_missile1);
-    // dest = vec3.fromValues(-5,-6,4);
-    // src = vec3.fromValues(45,45,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile1.animate_missile(src,dest,5,5);
-
-    // for(var i=0; i<2; i++)
-    // {
-    //     sky_missile1 = new SkyMissile(gl);
-    //     sky_missile1.load_missile(4, 4, 4);
-    //     scenes.push(sky_missile1);
-    //     val12 = destinations[Math.floor(Math.random()*destinations.length)];
-    //     console.log("*************** valll"+ val12);
-    //     dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)]*10, -3,4);
-    //     src= vec3.fromValues(generateRandomValue(-100, 150), 40, 4);
-    //     sky_missile1.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
-    // }
-
-    //missile source 70 -80
-    //missile destination 70 -80
+    //destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
     for(var i=0; i<4; i++){
-        sky_missile2 = new SkyMissile(gl);
-        sky_missile2.load_missile(4, 4, 4);
-        scenes.push(sky_missile2);
-        val12 = destinations[Math.floor(Math.random()*destinations.length)];
-        dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
-        src= vec3.fromValues(generateRandomValue(-80,70), 40, 4);
-       // dest = vec3.fromValues(70, -3, 4);
-        //src= vec3.fromValues(-80, 80, 4);
-        sky_missile2.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
+        var dest = scenes[getRandomScene(0,9)];
+        if(dest.visible==true){
+            attack_missile = new AttackMissile(gl);
+            
+            //val12 = destinations[Math.floor(Math.random()*destinations.length)];
+           // dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
+            src= vec3.fromValues(generateRandomValue(-80,70), 40, 4);
+
+            attack_missile.load_missile(src[0], src[1], src[2]);
+
+            attack_missile_list.push(attack_missile);
+            var trans_x = (src[0]-dest.x*10)/20;
+            var trans_y = (src[1]-dest.y*10)/20;
+            attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
+        }
     }
-
-        // sky_missile3 = new SkyMissile(gl);
-        // sky_missile3.load_missile(4, 4, 4);
-        // scenes.push(sky_missile3);
-        // val12 = destinations[Math.floor(Math.random()*destinations.length)];
-        // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)]*10, -3,4);
-        // src= vec3.fromValues(generateRandomValue(-50,50), 40, 4);
-        // sky_missile3.animate_missile(src,dest, (src[0]-dest[0])/20 , (src[1]-dest[1])/20);
-
-
-
-    // //missile two
-    // sky_missile2 = new SkyMissile(gl);
-    // sky_missile2.load_missile(4, 4, 4);
-    // scenes.push(sky_missile2);
-    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
-    // src= vec3.fromValues(generateRandomValue(0,50), 40, 4);
-    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile2.animate_missile(src,dest, (src[0]-dest[0])/20, (src[1]-dest[1])/20);
-
-
-    //     //missile three
-    // sky_missile3 = new SkyMissile(gl);
-    // sky_missile3.load_missile(4, 4, 4);
-    // scenes.push(sky_missile3);
-    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
-    // src= vec3.fromValues(generateRandomValue(50,100), 40, 4);
-    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile3.animate_missile(src,dest, (src[0]-dest[0])/40, (src[1]-dest[1])/40);
-
-    //     //missile four
-    // sky_missile4 = new SkyMissile(gl);
-    // sky_missile4.load_missile(4, 4, 4);
-    // scenes.push(sky_missile4);
-    // dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
-    // src= vec3.fromValues(generateRandomValue(150,180), 40, 4);
-    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile4.animate_missile(src,dest, (src[0]-dest[0])/13, (src[1]-dest[1])/13);
-
-    
-        //missile five
-    // sky_missile5 = new SkyMissile(gl);
-    // sky_missile5.load_missile(4, 4, 4);
-    // scenes.push(sky_missile5);
-    // //dest = vec3.fromValues(destinations[Math.floor(Math.random()*destinations.length)],-7,4);
-    // dest = vec3.fromValues(-5, -2.5, 4);
-    // //src= vec3.fromValues(generateRandomValue(-10,23), 40, 4);
-    // src = vec3.fromValues(230, 40, 4);
-    // //src = vec3.fromValues(generateRandomValue(70,180),40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile5.animate_missile(src,dest, (src[0]-dest[0])/30, (src[1]-dest[1])/30);
-
-    // //     //missile six
-    // sky_missile6 = new SkyMissile(gl);
-    // sky_missile6.load_missile(4, 4, 4);
-    // scenes.push(sky_missile6);
-    // dest = vec3.fromValues(0,-6,4);
-    // src = vec3.fromValues(50,40,4);
-    // console.log("************** values: ****" + dest[0] + " " + src[0]);
-    // sky_missile6.animate_missile(src,dest,5,5);
 
     setTimeout(launch_missile, 3000);
 }
 
-// animate_missile()
-// {
+function launch_spaceship()
+{
 
-//     setTimeout(animate_missile, 3000);
-//     sky_missile.modelMatrix //translate this
-// }
+    //add audio
+
+   //  var missileAudio = document.createElement('audio');
+   //  var audio_source = document.createElement('source');
+   //  audio_source.src = "/Users/pjain12/Downloads/gameOver.wav";
+   //  missileAudio.appendChild(audio_source);
+   // // missileAudio.play();
+
+
+    //destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
+        var spaceship = new SpaceShip(gl);
+        spaceship.load_spaceship(23, 30, 4);
+        attack_missile_list.push(spaceship);
+
+            
+        //val12 = destinations[Math.floor(Math.random()*destinations.length)];
+       // dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
+        // var src= vec3.fromValues(23, 3, 4);
+        var dest = vec3.fromValues(-10,30,4);
+
+        // var trans_x = (src[0]-dest.x*10)/20;
+        // var trans_y = (src[1]-dest.y*10)/20;
+        spaceship.animate_spaceship(0.5,dest);
+
+        setTimeout(launch_spaceship, 9000);
+}
+
 
 
 // setup the webGL shaders
@@ -646,8 +584,49 @@ function setupShaders() {
     } // end catch
 } // end setup shaders
 
+//send 
+function send_defend_missile(event){
+
+    val_x = event.clientX/window.innerWidth;
+    val_y = event.clientY/window.innerHeight;
+
+    canvas_x = -35*val_x + 25;
+    canvas_y = -10*val_y + 10;
+
+    console.log("********* canvas_x: " + canvas_x);
+    console.log("********* canvas_y: " + canvas_y);
+
+    defend_missile = new DefendMissile(gl);
+    defend_missile.load_missile(4, 4, 4);
+    defend_missile_list.push(defend_missile);
+    dest= vec3.fromValues(10*canvas_x, 10*canvas_y, 4);
+
+    if(canvas_x>10)
+    {
+        console.log("********* inside if *******");
+        src = vec3.fromValues(80, -0.8, 4);
+    }
+    else if(canvas_x >0 && canvas_x<=10)
+    {
+        console.log("********* inside else if *********");
+        src = vec3.fromValues(7, -0.8, 4);
+    }
+    else{
+        console.log("*********** else ***********");
+        src = vec3.fromValues(-15, -0.8, 4);
+    }
+    console.log("********** src: *****" +src);
+
+    console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
+    defend_missile.animate_defend_missile(src, dest, (src[0]-dest[0])/8 , (src[1]-dest[1])/8, attack_missile_list, explode_list);
+}
+
+
 // render the loaded model
 function renderModels() {
+
+    console.log("************* inside render models ***********" + scenes.length);
+
     
     var pMatrix = mat4.create(); // projection matrix
     var vMatrix = mat4.create(); // view matrix
@@ -671,123 +650,205 @@ function renderModels() {
     //for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) {
        // currSet = inputTriangles[whichTriSet];
 
- //   console.log("*********** scene size: " + scenes.length);
+    currscene = scene_terrain[0];
+    mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+    gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
+    gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+    
+    // reflectivity: feed to the fragment shader
+    gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+    gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+    gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+    gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
+
+    gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
+
+    // vertex buffer: activate and feed into vertex shader
+    gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
+    gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+    gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
+    gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+    //uv buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
+    gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+    //bind texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
+    gl.uniform1i(samplerUniform, 0);
+
+    // triangle buffer: activate and render
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
+    //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+    gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+
+    //render scenes
     for (var iter=0; iter<scenes.length; iter++)
     {
         currscene = scenes[iter];
-        mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
-        gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
-        gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
-        
-        // reflectivity: feed to the fragment shader
-        gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
-        gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
-        gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
-        gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
+        if(currscene.visible==true){
+            mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+            gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
+            gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+            
+            // reflectivity: feed to the fragment shader
+            gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+            gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+            gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+            gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
 
-        gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
+            gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
 
-        // vertex buffer: activate and feed into vertex shader
-        gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
-        gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
-        gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
-        gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+            // vertex buffer: activate and feed into vertex shader
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
+            gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
+            gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
 
-        //uv buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
-        gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+            //uv buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
+            gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
 
-        //bind texture
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
-        gl.uniform1i(samplerUniform, 0);
+            //bind texture
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
+            gl.uniform1i(samplerUniform, 0);
 
-        // triangle buffer: activate and render
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
-        //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
-        gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+            // triangle buffer: activate and render
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
+            //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+            gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+        }
     }
 
-//         // make model transform, add to view project
-//        // makeModelTransform(terrain);
+    //render attack missile
+    for (var item=0; item<attack_missile_list.length; item++)
+    {
+        currscene = attack_missile_list[item];
+        if(currscene.visible==true)
+        {
+            mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+            gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
+            gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+            
+            // reflectivity: feed to the fragment shader
+            gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+            gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+            gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+            gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
 
-//         mat4.multiply(pvmMatrix,pvMatrix,mMatrix); // project * view * model
-//         gl.uniformMatrix4fv(mMatrixULoc, false, mMatrix); // pass in the m matrix
-//         gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
-        
-//         // reflectivity: feed to the fragment shader
-//         gl.uniform3fv(ambientULoc,terrain.material.ambient); // pass in the ambient reflectivity
-//         gl.uniform3fv(diffuseULoc,terrain.material.diffuse); // pass in the diffuse reflectivity
-//         gl.uniform3fv(specularULoc,terrain.material.specular); // pass in the specular reflectivity
-//         gl.uniform1f(shininessULoc,terrain.material.n); // pass in the specular exponent
+            gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
 
-//         gl.uniform1f(alphaULoc,terrain.material.alpha); //alpha location
+            // vertex buffer: activate and feed into vertex shader
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
+            gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
+            gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
 
-//         // vertex buffer: activate and feed into vertex shader
-//         gl.bindBuffer(gl.ARRAY_BUFFER,terrain.vertexBuffers); // activate
-//         gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
-//         gl.bindBuffer(gl.ARRAY_BUFFER,terrain.normalBuffers); // activate
-//         gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+            //uv buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
+            gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
 
-//         //uv buffer
-//         gl.bindBuffer(gl.ARRAY_BUFFER, terrain.textureBuffers);
-//         gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+            //bind texture
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
+            gl.uniform1i(samplerUniform, 0);
 
-//         //bind texture
-//         gl.activeTexture(gl.TEXTURE0);
-//         gl.bindTexture(gl.TEXTURE_2D, terrain.triangleTexture);
-//         gl.uniform1i(samplerUniform, 0);
+            // triangle buffer: activate and render
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
+            //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+            gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+        }
+    }
 
-//         // triangle buffer: activate and render
-//         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terrain.triangleBuffers); // activate
-//         gl.drawElements(gl.TRIANGLES,3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+    //render defend missiles
+    for (var item=0; item<defend_missile_list.length; item++)
+    {
+        currscene = defend_missile_list[item];
+        if(currscene.visible==true)
+        {
+            mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+            gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
+            gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+            
+            // reflectivity: feed to the fragment shader
+            gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+            gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+            gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+            gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
+
+            gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
+
+            // vertex buffer: activate and feed into vertex shader
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
+            gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
+            gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+            //uv buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
+            gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+            //bind texture
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
+            gl.uniform1i(samplerUniform, 0);
+
+            // triangle buffer: activate and render
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
+            //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+            gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+        }
+    }
+
+    //render explosion
+    for (var item=0; item<explode_list.length; item++)
+    {
+        currscene = explode_list[item];
+        if(currscene.visible==true)
+        {
+            mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
+            gl.uniformMatrix4fv(mMatrixULoc, false, currscene.modelMatrix); // pass in the m matrix
+            gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
+            
+            // reflectivity: feed to the fragment shader
+            gl.uniform3fv(ambientULoc,currscene.material.ambient); // pass in the ambient reflectivity
+            gl.uniform3fv(diffuseULoc,currscene.material.diffuse); // pass in the diffuse reflectivity
+            gl.uniform3fv(specularULoc,currscene.material.specular); // pass in the specular reflectivity
+            gl.uniform1f(shininessULoc,currscene.material.n); // pass in the specular exponent
+
+            gl.uniform1f(alphaULoc,currscene.material.alpha); //alpha location
+
+            // vertex buffer: activate and feed into vertex shader
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.vertexBuffers); // activate
+            gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
+            gl.bindBuffer(gl.ARRAY_BUFFER,currscene.normalBuffers); // activate
+            gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
+
+            //uv buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, currscene.textureBuffers);
+            gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
+
+            //bind texture
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, currscene.triangleTexture);
+            gl.uniform1i(samplerUniform, 0);
+
+            // triangle buffer: activate and render
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, currscene.triangleBuffers); // activate
+            //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+            gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
+        }
+    }
 
 
-//         //makeModelTransform(city1);
 
-//         mat4.multiply(pvmMatrix,pvMatrix,city1.modelMatrix); // project * view * model
-//         gl.uniformMatrix4fv(mMatrixULoc, false, city1.modelMatrix); // pass in the m matrix
-//         gl.uniformMatrix4fv(pvmMatrixULoc, false, pvmMatrix); // pass in the hpvm matrix
-        
-//         // reflectivity: feed to the fragment shader
-//         gl.uniform3fv(ambientULoc,city1.material.ambient); // pass in the ambient reflectivity
-//         gl.uniform3fv(diffuseULoc,city1.material.diffuse); // pass in the diffuse reflectivity
-//         gl.uniform3fv(specularULoc,city1.material.specular); // pass in the specular reflectivity
-//         gl.uniform1f(shininessULoc,city1.material.n); // pass in the specular exponent
-
-//         gl.uniform1f(alphaULoc,city1.material.alpha); //alpha location
-
-//         // vertex buffer: activate and feed into vertex shader
-//         gl.bindBuffer(gl.ARRAY_BUFFER,city1.vertexBuffers); // activate
-//         gl.vertexAttribPointer(vPosAttribLoc,3,gl.FLOAT,false,0,0); // feed
-//         gl.bindBuffer(gl.ARRAY_BUFFER,city1.normalBuffers); // activate
-//         gl.vertexAttribPointer(vNormAttribLoc,3,gl.FLOAT,false,0,0); // feed\
-
-//         //uv buffer
-//         gl.bindBuffer(gl.ARRAY_BUFFER, city1.textureBuffers);
-//         gl.vertexAttribPointer(uvTextureLoc,2,gl.FLOAT,false,0,0);
-
-//         //bind texture
-//         gl.activeTexture(gl.TEXTURE0);
-//         gl.bindTexture(gl.TEXTURE_2D, city1.triangleTexture);
-//         gl.uniform1i(samplerUniform, 0);
-
-//         // triangle buffer: activate and render
-//         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, city1.triangleBuffers); // activate
-//         //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
-
-// gl.drawElements(gl.TRIANGLES, 36,gl.UNSIGNED_SHORT,0); // render       
-   // } // end for each triangle set
 } // end render model
 
 
-
 /* MAIN -- HERE is where execution begins after window load */
-
 function main() {
-       // testing ***********
-
-
   setupWebGL(); // set up the webGL environment
   loadModels(); // load in the models from tri file
   setupShaders(); // setup the webGL shaders

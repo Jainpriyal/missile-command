@@ -87,81 +87,82 @@ class MissileLauncher {
     	return (value & (value - 1)) == 0;
 	}
 
-load_missile(x, y, z){
-  	var vtxToAdd; // vtx coords to add to the coord array
-  	var normToAdd; // vtx normal to add to the coord array
-  	var uvToAdd; // uv coords to add to the uv arry
-  	var triToAdd; // tri indices to add to the index array
-	var whichSetVert;
-	var whichSetTri;
+	load_missile(x, y, z){
+	  	var vtxToAdd; // vtx coords to add to the coord array
+	  	var normToAdd; // vtx normal to add to the coord array
+	  	var uvToAdd; // uv coords to add to the uv arry
+	  	var triToAdd; // tri indices to add to the index array
+		var whichSetVert;
+		var whichSetTri;
 
-	var glVertices = []; // flat coord list for webgl
-	var glNormals = []; // flat normal list for webgl
-	var glUVs = []; //UVs for webgls 
-	var glTriangles = []; // flat index list for webgl  
+		var glVertices = []; // flat coord list for webgl
+		var glNormals = []; // flat normal list for webgl
+		var glUVs = []; //UVs for webgls 
+		var glTriangles = []; // flat index list for webgl  
 
-  	this.vertexBuffers = this.gl.createBuffer();
-  	this.normalBuffers = this.gl.createBuffer();
-  	this.textureBuffers = this.gl.createBuffer();
-  	this.triangleBuffers = this.gl.createBuffer(); // init empty triangle index buffer
-  	this.triSetSizes =0;
+	  	this.vertexBuffers = this.gl.createBuffer();
+	  	this.normalBuffers = this.gl.createBuffer();
+	  	this.textureBuffers = this.gl.createBuffer();
+	  	this.triangleBuffers = this.gl.createBuffer(); // init empty triangle index buffer
+	  	this.triSetSizes =0;
 
 
-  	this.x_val = x;
-	this.y_val = y;
-	this.z_val = z;
+	  	this.x = x;
+		this.y = y;
+		this.z = z;
 
-  	//scale the city
-  	var temp = mat4.create();
-  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.08,0.25,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
+	  	//scale the city
+	  	var temp = mat4.create();
+	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.08,0.25,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
 
-  	//translate city
-  	var translation = vec3.create();
-	//vec3.set (translation, -7, 0.8, 4);
-	vec3.set (translation, x, y, z);
-	mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+	  	//translate city
+	  	var translation = vec3.create();
+		//vec3.set (translation, -7, 0.8, 4);
+		vec3.set (translation, x, y, z);
+		mat4.translate (this.modelMatrix, this.modelMatrix, translation);
 
-    var numVerts = this.vertices.length; 
-  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
-  	{
-  	vtxToAdd = this.vertices[whichSetVert]; // get vertex to add
-  	normToAdd = this.normals[whichSetVert]; // get normal to add
-    uvToAdd = this.uvs[whichSetVert];
+	    var numVerts = this.vertices.length; 
+	  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
+	  	{
+		  	vtxToAdd = this.vertices[whichSetVert]; // get vertex to add
+		  	normToAdd = this.normals[whichSetVert]; // get normal to add
+		    uvToAdd = this.uvs[whichSetVert];
 
-    glVertices.push(vtxToAdd[0],vtxToAdd[1],vtxToAdd[2]); // put coords in set coord list
-    glNormals.push(normToAdd[0],normToAdd[1],normToAdd[2]); // put normal in set coord list
-    glUVs.push(uvToAdd[0], uvToAdd[1]);
+		    glVertices.push(vtxToAdd[0],vtxToAdd[1],vtxToAdd[2]); // put coords in set coord list
+		    glNormals.push(normToAdd[0],normToAdd[1],normToAdd[2]); // put normal in set coord list
+		    glUVs.push(uvToAdd[0], uvToAdd[1]);
 
-    //vec3.max(maxCorner,maxCorner,vtxToAdd); // update world bounding box corner maxima
-    //vec3.min(minCorner,minCorner,vtxToAdd); // update world bounding box corner minima
-    //vec3.add(inputTriangles[whichSet].center,inputTriangles[whichSet].center,vtxToAdd); // add to ctr sum
-    } // end for vertices in 
+		    //vec3.max(maxCorner,maxCorner,vtxToAdd); // update world bounding box corner maxima
+		    //vec3.min(minCorner,minCorner,vtxToAdd); // update world bounding box corner minima
+		    //vec3.add(inputTriangles[whichSet].center,inputTriangles[whichSet].center,vtxToAdd); // add to ctr sum
+	    } // end for vertices in 
 
-    //vec3.scale(inputTriangles[whichSet].center,inputTriangles[whichSet].center,1/numVerts); // avg ctr sum
+	    //vec3.scale(inputTriangles[whichSet].center,inputTriangles[whichSet].center,1/numVerts); // avg ctr sum
 
-    this.loadTexture();
+	    this.loadTexture();
 
-    this.gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffers); // activate that buffer
-    this.gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(glVertices),gl.STATIC_DRAW); // data in
+	    this.gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffers); // activate that buffer
+	    this.gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(glVertices),gl.STATIC_DRAW); // data in
 
-    this.gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffers); // activate that buffer
-    this.gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(glNormals),gl.STATIC_DRAW); // data in
+	    this.gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffers); // activate that buffer
+	    this.gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(glNormals),gl.STATIC_DRAW); // data in
 
-    //send texture coords to webgl
-    this.gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffers);
-    this.gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glUVs), gl.STATIC_DRAW);
-    
-    this.triSetSizes = this.triangles.length; // number of tris in this set
-    console.log("************** trisetsized: " + this.triSetSizes);
+	    //send texture coords to webgl
+	    this.gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffers);
+	    this.gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glUVs), gl.STATIC_DRAW);
+	    
+	    this.triSetSizes = this.triangles.length; // number of tris in this set
+	    console.log("************** trisetsized: " + this.triSetSizes);
 
-    for (whichSetTri=0; whichSetTri<this.triSetSizes; whichSetTri++) {
-		triToAdd = this.triangles[whichSetTri]; // get tri to add
-		glTriangles.push(triToAdd[0],triToAdd[1],triToAdd[2]); // put indices in set list
-	} // end for triangles in set
+	    for (whichSetTri=0; whichSetTri<this.triSetSizes; whichSetTri++)
+	    {
+			triToAdd = this.triangles[whichSetTri]; // get tri to add
+			glTriangles.push(triToAdd[0],triToAdd[1],triToAdd[2]); // put indices in set list
+		} // end for triangles in set
 
-	// send the triangle indices to webGl
-	this.gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangleBuffers); // activate that buffer
-	this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(glTriangles),gl.STATIC_DRAW); // data in
-   } // end for each triangle set 
+		// send the triangle indices to webGl
+		this.gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangleBuffers); // activate that buffer
+		this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(glTriangles),gl.STATIC_DRAW); // data in
+	   } // end for each triangle set 
 }
 

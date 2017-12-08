@@ -1,4 +1,4 @@
-class City {
+class Explosion {
 
 	constructor(gl)
 	{
@@ -11,7 +11,7 @@ class City {
 		this.xAxis = vec3.fromValues(1,0,0);
 		this.yAxis = vec3.fromValues(0,1,0);
 
-		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.4,0.4,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "grass.jpg"};
+		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.4,0.4,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "explosion.png"};
 		this.vertices = [[-1,1,0.5], [1,1,0.5], [1,-0.8,0.5], [-1,-0.8,0.5], [1,1,-0.5], [-1,1,-0.5], [1,-0.8,-0.5], [-1,-0.8,-0.5]];
 		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
 
@@ -27,26 +27,18 @@ class City {
 						  [5,0,3], [5,3,7],
 						  [4,1,2],[4,1,6]];
 
-		// this.vertices=[[-0.5,-0.5,-0.5],[0.5,-0.5,-0.5],[0.5,-0.5,0.5],[-0.5,-0.5,0.5],
-  //           [-0.5,0.5,-0.5],[0.5,0.5,-0.5],[0.5,0.5,0.5],[-0.5,0.5,0.5],
-  //           [-0.5,0.51,-0.5],[0.5,0.51,-0.5],[0.5,0.51,0.5],[-0.5,0.51,0.5]];
+		// this.vertices = [[-0.5, -0.5, 0.5],[-0.5, 0.5, 0.5],[0.5,-0.5,0.5],[0.5,-0.5,0.5]];
+		// this.normals = [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1]];
+		// this.uvs = [[0,1], [0,1], [1,0], [1,1]];
+		// this.triangles = [[0,1,2],[1,3,2]];
 
-  //           this.normals=[[0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
-  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
-  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1]];
+		// this.vertices= [[-0.5, -0.5, 0.5],[-0.5, 0.5, 0.5],[0.5,0.5,0.5],[0.5,-0.5,0.5]];
+  //   	this.normals = [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1]],
+  //   	this.uvs=[[0,0], [0,1], [1,1], [1,0]];
+  //   	this.triangles = [[0,1,2],[2,3,0]];
 
-  //           this.uvs=[[1,0], [0.76,0], [1,0], [0.76,0],
-  //           [1,0.48], [0.76,0.48], [1,0.48], [0.76,0.48],
-  //           [1,0], [0.76,0], [0.76,0.48], [1,0.48]];
-
-  //           this.triangles=[[0,1,4],[4,5,1],
-  //           [1,2,5],[5,6,2],
-  //           [2,3,6],[6,7,3],
-  //           [3,0,7],[4,7,0],
-  //           [4,5,6],[6,7,4],
-  //           [8,9,11],[11,10,9]];
-
-		this.modelMatrix = mat4.create();
+  
+		 this.modelMatrix = mat4.create();
 	}
 
 	loadTexture()
@@ -60,7 +52,7 @@ class City {
 	        self.handleTexture();
 	    }
 	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
-	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/city_trans1.png";
+	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/explosion.png";
 	}
 
 	//function to handle loaded texture
@@ -88,7 +80,7 @@ class City {
     	return (value & (value - 1)) == 0;
 	}
 
-	load_city(x,y,z)
+	load_explosion(x,y,z)
 	{
 	  	var vtxToAdd; // vtx coords to add to the coord array
 	  	var normToAdd; // vtx normal to add to the coord array

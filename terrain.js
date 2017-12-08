@@ -4,6 +4,7 @@ class Terrain {
 		this.gl = gl;
 		this.center = vec3.fromValues(0,0,0);
 		this.on = false;
+		this.visible = true;
 
 		this.translation = vec3.fromValues(0,0,0);
 		this.xAxis = vec3.fromValues(1,0,0);
