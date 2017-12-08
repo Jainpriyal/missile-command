@@ -12,8 +12,10 @@ class MissileLauncher {
 		this.yAxis = vec3.fromValues(0,1,0);
 
 		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 0.6, "texture": "grass.jpg"};
-		this.vertices = [[-1,1,0.5], [1,1,0.5], [1,-0.8,0.5], [-1,-0.8,0.5], [1,1,-0.5], [-1,1,-0.5], [1,-0.8,-0.5], [-1,-0.8,-0.5]];
+
+		this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
 		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
+
 
 		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
 		this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
@@ -26,6 +28,21 @@ class MissileLauncher {
 						  [5,4,1],[5,1,0],
 						  [5,0,3], [5,3,7],
 						  [4,1,2],[4,1,6]];
+
+		// this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
+		// //this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
+
+		// //this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
+		// this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
+		// //this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [0.8,0.9], [0,0], [0.8, 0]];
+		// this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [1,1], [0,0], [1, 0]];
+
+		// this.triangles = [[0,1,2],[0,2,3], 
+		// 				  [7,6,2], [7,2,3], 
+		// 				  [5,4,6], [5,6,7], 
+		// 				  [5,4,1],[5,1,0],
+		// 				  [5,0,3], [5,3,7],
+		// 				  [4,1,2],[4,1,6]];
 
 		// this.vertices=[[-0.5,-0.5,-0.5],[0.5,-0.5,-0.5],[0.5,-0.5,0.5],[-0.5,-0.5,0.5],
   //           [-0.5,0.5,-0.5],[0.5,0.5,-0.5],[0.5,0.5,0.5],[-0.5,0.5,0.5],
@@ -113,13 +130,17 @@ class MissileLauncher {
 
 	  	//scale the city
 	  	var temp = mat4.create();
-	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.08,0.25,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
+	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.4,0.8,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
 
-	  	//translate city
+	 //  	//translate city
+	 //  	var translation = vec3.create();
+		// //vec3.set (translation, -7, 0.8, 4);
+		// vec3.set (translation, x, y, z);
+		// mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+
+		var temp1 = mat4.create();
 	  	var translation = vec3.create();
-		//vec3.set (translation, -7, 0.8, 4);
-		vec3.set (translation, x, y, z);
-		mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(x,y+0.4,z)), this.modelMatrix);
 
 	    var numVerts = this.vertices.length; 
 	  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)

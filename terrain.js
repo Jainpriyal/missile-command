@@ -11,7 +11,7 @@ class Terrain {
 		this.yAxis = vec3.fromValues(0,1,0);
 
 		this.material = {"ambient": [1,1,1], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "grass.jpg"};
-		this.vertices = [[-5, -0.5, 0.8],[-5, -0.5, -0.8],[5,-0.5,-0.8],[5,-0.5,0.8]];
+		this.vertices = [[-15, 0, 5],[-15, 0, -5],[15,0,-5],[15,0,5]];
 		this.normals = [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1]];
 		this.uvs = [[0,0], [0,1], [1,1], [1,0]];
 		this.triangles = [[0,1,2],[2,3,0]];

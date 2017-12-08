@@ -2,8 +2,8 @@
 
 /* assignment specific globals */
 const INPUT_TRIANGLES_URL = "https://ncsucgclass.github.io/prog3/triangles.json"; // triangles file loc
-var defaultEye = vec3.fromValues(0.5,0.5,-1); // default eye position in world space
-var defaultCenter = vec3.fromValues(0.5,0.5,0.5); // default view direction in world space
+var defaultEye = vec3.fromValues(0,1,-5); // default eye position in world space
+var defaultCenter = vec3.fromValues(0,3,7  ); // default view direction in world space
 var defaultUp = vec3.fromValues(0,1,0); // default view up vector
 var lightAmbient = vec3.fromValues(1,1,1); // default light ambient emission
 var lightDiffuse = vec3.fromValues(1,1,1); // default light diffuse emission
@@ -315,32 +315,32 @@ function loadModels() {
 
     //load cities
     var city1 = new City(gl);
-    city1.load_city(-5, -2.5, 4);
+    city1.load_city(-1.5, 0, 0);
 
     var city2 = new City(gl);
-    city2.load_city(-1, -2.5, 4);
+    city2.load_city(-1, 0,0);
 
     var city3 = new City(gl);
-    city3.load_city(3, -2.5, 4);
+    city3.load_city(-0.5, 0,0);
 
     var city4 = new City(gl);
-    city4.load_city(9.5, -2.5, 4);
+    city4.load_city(0.5, 0,0);
 
     var city5 = new City(gl);
-    city5.load_city(13, -2.5, 4);
+    city5.load_city(1, 0,0);
 
     var city6 = new City(gl);
-    city6.load_city(17, -2.5, 4);
+    city6.load_city(1.5, 0,0);
 
     //load missile launchers
     var missile_launcher1 = new MissileLauncher(gl);
-    missile_launcher1.load_missile(-10, -0.8, 4);
+    missile_launcher1.load_missile(-2, 0,0);
 
     var missile_launcher2 = new MissileLauncher(gl);
-    missile_launcher2.load_missile(7, -0.8, 4);
+    missile_launcher2.load_missile(0,0,0);
 
     var missile_launcher3 = new MissileLauncher(gl);
-    missile_launcher3.load_missile(23, -0.8, 4);
+    missile_launcher3.load_missile(2, 0,0);
 
     scene_terrain.push(terrain);
     scenes.push(city1);
@@ -355,9 +355,9 @@ function loadModels() {
     scenes.push(missile_launcher2);
     scenes.push(missile_launcher3);
     
-    launch_missile();
+   launch_missile();
 
-    launch_spaceship();
+    //launch_spaceship();
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -377,21 +377,26 @@ function launch_missile()
 
 
     //destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
-    for(var i=0; i<4; i++){
-        var dest = scenes[getRandomScene(0,9)];
+    for(var i=0; i<2; i++){
+        var dest = scenes[getRandomScene(0,scenes.length)];
+        // var dest = vec3.fromValues(-1.5, 0, 0);
         if(dest.visible==true){
             attack_missile = new AttackMissile(gl);
             
             //val12 = destinations[Math.floor(Math.random()*destinations.length)];
            // dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
-            src= vec3.fromValues(generateRandomValue(-80,70), 40, 4);
+           // src= vec3.fromValues(generateRandomValue(-10,10), 10, 0);
+            src= vec3.fromValues(generateRandomValue(-2.5, 2.5), 4, 0);
 
             attack_missile.load_missile(src[0], src[1], src[2]);
 
             attack_missile_list.push(attack_missile);
-            var trans_x = (src[0]-dest.x*10)/20;
-            var trans_y = (src[1]-dest.y*10)/20;
+            var trans_x = (src[0]-dest.x)/30;
+            var trans_y = (src[1]-dest.y)/30;
             attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
+        }
+        else{
+            i=i-1;
         }
     }
 
@@ -427,8 +432,51 @@ function launch_spaceship()
 
         setTimeout(launch_spaceship, 9000);
 }
+//send 
+function send_defend_missile(event){
 
+    val_x = (event.clientX/window.innerWidth)*2-1;
+    val_y = (event.clientY/window.innerHeight)*2-1;
 
+    console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
+    //canvas_x = -2.25*val_x - 0.25;
+    canvas_x = -2.5*val_x;
+    canvas_y = -2*val_y + 2;
+    // canvas_y = -10*val_y + 10;
+
+    console.log("********* canvas_x: " + canvas_x);
+    console.log("********* canvas_y: " + canvas_y);
+
+    defend_missile = new DefendMissile(gl);
+    dest= vec3.fromValues(canvas_x, canvas_y, 0);
+
+    if(canvas_x>1.5 && scenes[8].visible==true)
+    {
+        console.log("********* inside if *******");
+        src = vec3.fromValues(2, 0, 0);
+    }
+    else if(canvas_x>0.5 && scenes[7].visible==true)
+    {
+        console.log("********* inside else if *********");
+        src = vec3.fromValues(0, 0, 0);
+
+    }
+    else if(scenes[6].visible==true){
+                console.log("********* inside last else if *********");
+        src = vec3.fromValues(-2, 0, 0);
+
+    }
+    else{
+                console.log("********* inside else *********");
+        return;
+    }
+    defend_missile.load_missile(src[0], src[1], 0);
+    defend_missile_list.push(defend_missile);
+    console.log("********** src: *****" +src);
+
+    // console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
+    defend_missile.animate_defend_missile((src[0]-dest[0])/8 , (src[1]-dest[1])/8, dest, attack_missile_list, explode_list);
+}
 
 // setup the webGL shaders
 function setupShaders() {
@@ -584,43 +632,6 @@ function setupShaders() {
     } // end catch
 } // end setup shaders
 
-//send 
-function send_defend_missile(event){
-
-    val_x = event.clientX/window.innerWidth;
-    val_y = event.clientY/window.innerHeight;
-
-    canvas_x = -35*val_x + 25;
-    canvas_y = -10*val_y + 10;
-
-    console.log("********* canvas_x: " + canvas_x);
-    console.log("********* canvas_y: " + canvas_y);
-
-    defend_missile = new DefendMissile(gl);
-    defend_missile.load_missile(4, 4, 4);
-    defend_missile_list.push(defend_missile);
-    dest= vec3.fromValues(10*canvas_x, 10*canvas_y, 4);
-
-    if(canvas_x>10)
-    {
-        console.log("********* inside if *******");
-        src = vec3.fromValues(80, -0.8, 4);
-    }
-    else if(canvas_x >0 && canvas_x<=10)
-    {
-        console.log("********* inside else if *********");
-        src = vec3.fromValues(7, -0.8, 4);
-    }
-    else{
-        console.log("*********** else ***********");
-        src = vec3.fromValues(-15, -0.8, 4);
-    }
-    console.log("********** src: *****" +src);
-
-    console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
-    defend_missile.animate_defend_missile(src, dest, (src[0]-dest[0])/8 , (src[1]-dest[1])/8, attack_missile_list, explode_list);
-}
-
 
 // render the loaded model
 function renderModels() {
@@ -640,7 +651,7 @@ function renderModels() {
     
     // set up projection and view
     // mat4.fromScaling(hMatrix,vec3.fromValues(-1,1,1)); // create handedness matrix
-    mat4.perspective(pMatrix,0.5*Math.PI,1,0.1,10); // create projection matrix
+    mat4.perspective(pMatrix,0.3*Math.PI,1,0.1,100); // create projection matrix
     mat4.lookAt(vMatrix,Eye,Center,Up); // create view matrix
     mat4.multiply(pvMatrix,pvMatrix,pMatrix); // projection
     mat4.multiply(pvMatrix,pvMatrix,vMatrix); // projection * view

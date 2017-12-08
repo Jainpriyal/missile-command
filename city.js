@@ -12,8 +12,9 @@ class City {
 		this.yAxis = vec3.fromValues(0,1,0);
 
 		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.4,0.4,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "grass.jpg"};
-		this.vertices = [[-1,1,0.5], [1,1,0.5], [1,-0.8,0.5], [-1,-0.8,0.5], [1,1,-0.5], [-1,1,-0.5], [1,-0.8,-0.5], [-1,-0.8,-0.5]];
+		this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
 		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
+
 
 		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
 		this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
@@ -113,12 +114,16 @@ class City {
 
 	  	//scale the city
 	  	var temp = mat4.create();
-	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.09,0.14,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
+	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.2,0.4,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
 
-	  	//translate city
+	 //  	//translate city
+	 //  	var translation = vec3.create();
+		// vec3.set (translation, x,(y+0.4),z);
+		// mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+
+		var temp1 = mat4.create();
 	  	var translation = vec3.create();
-		vec3.set (translation, x,y,z);
-		mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(x,y+0.2,z)), this.modelMatrix);
 
 	    var numVerts = this.vertices.length; 
 	  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
