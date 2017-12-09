@@ -155,7 +155,7 @@ class AttackMissile {
    		//animate missile only destroy city or missile launcher
    		this.modelMatrix = mat4.create();
    		var temp = mat4.create();
-  		mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.1,0.2,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
+  		mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.1,0.15,0.08)),this.modelMatrix); // S(1.2) * T(-ctr)
 
   		this.x = this.x - add_x;
   		this.y = this.y - add_y;
@@ -175,6 +175,11 @@ class AttackMissile {
 	   	var distance = Math.sqrt(val_x * val_x + val_y * val_y);
 	   	if(distance<0.5 && this.visible==true)
 	   	{
+	   		console.log("******explosion this.x:" + this.x + "***** this.y:" + this.y);
+	   		var explode = new Explosion(this.gl);
+   			explode.load_explosion(this.x, this.y, 0);
+			explode_list.push(explode);
+			explode.animate_explosion();
 	   		scene.visible = false;
 	   		this.visible = false;
 	   		missileAudio.play();

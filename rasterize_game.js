@@ -357,7 +357,7 @@ function loadModels() {
     
     launch_missile();
 
-    launch_spaceship();
+   // launch_spaceship();
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -407,37 +407,78 @@ function send_defend_missile(event){
 
     console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
     //canvas_x = -2.25*val_x - 0.25;
-    canvas_x = -2.7*val_x + 0.2;
-    canvas_y = -2.7*val_y + 2.;
+    //canvas_x = -2.7*val_x -0.2;
+    canvas_x = -3*val_x - 0.27;
+    //canvas_x = 4*val_x;
+    canvas_y = -2.7*val_y + 2.4;
     // canvas_y = -10*val_y + 10;
 
     console.log("********* canvas_x: " + canvas_x);
     console.log("********* canvas_y: " + canvas_y);
 
+    if(scenes[6].visible==true){
+        d1 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0),vec3.fromValues(-2,0,0));
+    }
+    else{
+        d1 = 10000;
+    }
+    if(scenes[7].visible==true){
+        d2 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0),vec3.fromValues(0,0,0));
+    }
+    else{
+        d2 = 10000;
+    }
+    if(scenes[8].visible==true)
+    {
+        d3 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0), vec3.fromValues(2,0,0));
+    }
+    else
+    {
+        d3=10000;
+    }
+
+    if(d1<d2 && d1<d3 && d1!=10000)
+    {
+        src = vec3.fromValues(-2,0,0);
+    }
+    else if(d2<d1 && d2<d3 && d2!=10000)
+    {
+        src = vec3.fromValues(0,0,0);
+    }
+    else if(d3<d1 && d3<d2 && d3!=10000)
+    {
+        src = vec3.fromValues(2,0,0);
+    }
+    else{
+        return;
+    }
+
     defend_missile = new DefendMissile(gl);
     dest= vec3.fromValues(canvas_x, canvas_y, 0);
 
-    scenes[8].visible==false;
-    if(canvas_x>1.5 && scenes[8].visible==true)
-    {
-        console.log("********* inside if *******");
-        src = vec3.fromValues(2, 0, 0);
-    }
-    else if(canvas_x>0.5 && scenes[7].visible==true)
-    {
-        console.log("********* inside else if *********");
-        src = vec3.fromValues(0, 0, 0);
+    //scenes[8].visible==false;
 
-    }
-    else if(scenes[6].visible==true){
-                console.log("********* inside last else if *********");
-        src = vec3.fromValues(-2, 0, 0);
+    //src = vec3.fromValues(0, 0, 0);
+    // if(canvas_x>1.5 && scenes[8].visible==true)
+    // {
+    //     console.log("********* inside if *******");
+    //     src = vec3.fromValues(2, 0, 0);
+    // }
+    // else if(canvas_x>0.5 && scenes[7].visible==true)
+    // {
+    //     console.log("********* inside else if *********");
+    //     src = vec3.fromValues(0, 0, 0);
 
-    }
-    else{
-                console.log("********* inside else *********");
-        return;
-    }
+    // }
+    // else if(scenes[6].visible==true){
+    //             console.log("********* inside last else if *********");
+    //     src = vec3.fromValues(-2, 0, 0);
+
+    // }
+    // else{
+    //             console.log("********* inside else *********");
+    //     return;
+    // }
     defend_missile.load_missile(src[0], src[1], 0);
     defend_missile_list.push(defend_missile);
     console.log("********** src: *****" +src);
@@ -825,11 +866,11 @@ function renderModels() {
 
 } // end render model
 
-
 /* MAIN -- HERE is where execution begins after window load */
 function main() {
   setupWebGL(); // set up the webGL environment
+
   loadModels(); // load in the models from tri file
   setupShaders(); // setup the webGL shaders
-  renderModels(); // draw the triangles using webGL  
+  renderModels(); // draw the triangles using webGL 
 } // end main
