@@ -152,7 +152,6 @@ class AttackMissile {
 	//add destination also
    	animate_missile(add_x, add_y, scene, explode_list)
    	{
-   		//console.log("********** inside animate missile");
    		//animate missile only destroy city or missile launcher
    		this.modelMatrix = mat4.create();
    		var temp = mat4.create();
@@ -166,64 +165,11 @@ class AttackMissile {
 	    audio_source.src = "/Users/pjain12/Downloads/squash.wav";
 	    missileAudio.appendChild(audio_source);
 
-   		var translation = vec3.create();
-
-   		//vec3.set (translation, src[0], src[1], 4);
-   		vec3.set (translation, this.x, this.y, this.z);
-
-
-   	// 	console.log("Tranlate:"+this.x+","+this.y);
-  		// //console.log("translation:" + translation);
-   	// 	mat4.translate(this.modelMatrix, this.modelMatrix, translation);
-
-
    		//translate city
 	  	var temp1 = mat4.create();
-	  	var translation = vec3.create();
 	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(this.x,this.y,0)), this.modelMatrix);
 
-	  	// console.log("********** destroyed objects: " + scene.x + "this.x: " + this.x);
-   	// 	console.log("********** destroyed objects: " + scene.y + "this.y: " + this.y);
-
    		var self = this;
-   		// if(scene.x<0)
-   		// {
-   		// 	console.log("************* x less than 0 *****" + scene.x + "this.x: " + this.x);
-   		// 	console.log("********* scene.y: " + scene.y + "this.y: " + this.y);
-
-	   	// 	if(scene.x+0.2<=this.x<=scene.x-0.2 && scene.y-0.2<=this.y<=scene.y+0.2)
-	   	// 	{
-	   	// 		console.log("************* x less than 0");
-	   	// 		console.log("********** destroyed objects: " + scene.x + "this.x: " + this.x);
-			  //   // var explode = new Explosion(this.gl);
-	   	// 		// explode.load_explosion(scene.x, scene.y, scene.z);
-	   	// 		// explode_list.push(explode);
-			  //   // missileAudio.play();
-			  //   // console.log("********* playing audio **********");
-			  //   scene.visible = false;
-			  //   this.visible = false;
-	   	// 		return;
-	   	// 	}
-	   	// 	else
-	   	// 	{
-   		// 		setTimeout(function(){self.animate_missile(add_x,add_y, scene,explode_list);}, 150);
-   		// 	}
-	   	// }
-	   	// else if(scene.x>=0)
-	   	// {
-	   	// 	if(scene.x-0.2<=this.x<=scene.x+0.2 && scene.y-0.2<=this.y<=scene.y+0.2)
-	   	// 	{
-	   	// 		console.log("********** destroyed objects: " + scene.x + "this.x: " + this.x);
-			  //   // var explode = new Explosion(this.gl);
-	   	// 		// explode.load_explosion(scene.x, scene.y, scene.z);
-	   	// 		// explode_list.push(explode);
-			  //   // missileAudio.play();
-			  //   // console.log("********* playing audio **********");
-			  //   scene.visible = false;
-			  //   this.visible = false;
-	   	// 		return;
-	   	// 	}
-
 	   	var val_x = this.x - scene.x;
 	   	var val_y = this.y - scene.y;
 	   	var distance = Math.sqrt(val_x * val_x + val_y * val_y);
@@ -238,45 +184,5 @@ class AttackMissile {
    			setTimeout(function(){self.animate_missile(add_x,add_y, scene,explode_list);}, 150);
 	   	}
    }
-
-   //function for killing sky_missile
-   //dont know the position of those missile
-   // animate_defend_missile(src, dest, add_x, add_y, attack_missile_list, explode_list)
-   // {
-   // 		//defend missile only destroy attack missile in its radius
-   // 		this.modelMatrix = mat4.create();
-   // 		var temp = mat4.create();
-  	// 	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.02,0.035,0.02)),this.modelMatrix); // S(1.2) * T(-ctr)
-
-   // 		src[0] = src[0] - add_x;
-   // 		src[1] = src[1] - add_y;
-   // 		this.x = src[0];
-   // 		this.y = src[1];
-
-   // 		var translation = vec3.create();
-   // 		vec3.set (translation, src[0], src[1], 4);
-   // 		mat4.translate(this.modelMatrix, this.modelMatrix, translation);
-   // 		var self = this;
-
-   // 		if(10*dest[0]-10<=this.x<=10*dest[0]+10 && 10*dest[1]-10<=this.y<=10*dest[1]+10)
-   // 		{
-   // 			//translate this missile till destination then check if any attack missile is in range
-   // 			//if any of them is in range, explode them
-   // 			for(var attack_missile=0; attack_missile<attack_missile_list.length; attack_missile++)
-   // 			{
-   // 				if(10*attack_missile.x-10<=this.x<=10*attack_missile.x+10 && 10*attack_missile.y-10<=this.y<=10*attack_missile.y+10){
-   // 					attack_missile_list[attack_missile].visible = false;
-   // 					this.visible = false;
-   // 					// var explode = new Explosion(this.gl);
-   // 					// explode.load_explosion(dest[0], dest[1], dest[z]);
-   // 					// explode_list.push(explode);
-   // 				}
-   // 			}
-   // 			return;
-   // 		}
-   // 		else{
-   // 			setTimeout(function(){self.animate_defend_missile(src, dest,add_x,add_y, attack_missile_list, explode_list);}, 150);
-   // 		}
-   // }
 }
 

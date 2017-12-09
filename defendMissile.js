@@ -199,45 +199,6 @@ class DefendMissile {
    			setTimeout(function(){self.animate_defend_missile(add_x, add_y, dest, attack_missile_list, explode_list);}, 150);
 	   	}
    }
-
-   //function for killing sky_missile
-   //dont know the position of those missile
-   // animate_defend_missile(src, dest, add_x, add_y, attack_missile_list, explode_list)
-   // {
-   // 		//defend missile only destroy attack missile in its radius
-   // 		this.modelMatrix = mat4.create();
-   // 		var temp = mat4.create();
-  	// 	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.02,0.035,0.02)),this.modelMatrix); // S(1.2) * T(-ctr)
-
-   // 		src[0] = src[0] - add_x;
-   // 		src[1] = src[1] - add_y;
-   // 		this.x = src[0];
-   // 		this.y = src[1];
-
-   // 		var translation = vec3.create();
-   // 		vec3.set (translation, src[0], src[1], 4);
-   // 		mat4.translate(this.modelMatrix, this.modelMatrix, translation);
-   // 		var self = this;
-
-   // 		if(10*dest[0]-10<=this.x<=10*dest[0]+10 && 10*dest[1]-10<=this.y<=10*dest[1]+10)
-   // 		{
-   // 			//translate this missile till destination then check if any attack missile is in range
-   // 			//if any of them is in range, explode them
-   // 			for(var attack_missile=0; attack_missile<attack_missile_list.length; attack_missile++)
-   // 			{
-   // 				if(10*attack_missile.x-10<=this.x<=10*attack_missile.x+10 && 10*attack_missile.y-10<=this.y<=10*attack_missile.y+10){
-   // 					attack_missile_list[attack_missile].visible = false;
-   // 					this.visible = false;
-   // 					// var explode = new Explosion(this.gl);
-   // 					// explode.load_explosion(dest[0], dest[1], dest[z]);
-   // 					// explode_list.push(explode);
-   // 				}
-   // 			}
-   // 			return;
-   // 		}
-   // 		else{
-   // 			setTimeout(function(){self.animate_defend_missile(src, dest,add_x,add_y, attack_missile_list, explode_list);}, 150);
-   // 		}
-
+   
 }
 

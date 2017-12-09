@@ -11,7 +11,7 @@ class SpaceShip {
 		this.yAxis = vec3.fromValues(0,1,0);
 
 		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 0.6, "texture": "grass.jpg"};
-		this.vertices = [[-1,1,0.5], [1,1,0.5], [1,-0.8,0.5], [-1,-0.8,0.5], [1,1,-0.5], [-1,1,-0.5], [1,-0.8,-0.5], [-1,-0.8,-0.5]];
+		this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
 		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
 
 		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
@@ -40,7 +40,6 @@ class SpaceShip {
 	    {
 	        self.handleTexture();
 	    }
-	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
 	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/missile_transparent.png";
 	}
 
@@ -94,13 +93,16 @@ class SpaceShip {
 
 	  	//scale the city
 	  	var temp = mat4.create();
-	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.08,0.25,0.12)),this.modelMatrix); // S(1.2) * T(-ctr)
+	  	this.modelMatrix=mat4.create();
+	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.4,0.25,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
 
 	  	//translate city
+	  	var temp1 = mat4.create();
 	  	var translation = vec3.create();
+	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(x,y,z)), this.modelMatrix);
 		//vec3.set (translation, -7, 0.8, 4);
-		vec3.set (translation, x, y, z);
-		mat4.translate (this.modelMatrix, this.modelMatrix, translation);
+		//vec3.set (translation, x, y, z);
+		//mat4.translate (this.modelMatrix, this.modelMatrix, translation);
 
 	    var numVerts = this.vertices.length; 
 	  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
@@ -147,19 +149,19 @@ class SpaceShip {
 
 
 	//add destination also
-   	animate_spaceship(add_x, dest)
+	animate_spaceship(add_x, dest)
    	{
    		//animate missile only destroy city or missile launcher
    		this.modelMatrix = mat4.create();
    		var temp = mat4.create();
-  		mat4.multiply(this.modelMatrix, mat4.fromScaling(temp,vec3.fromValues(0.08,0.035,0.02)),this.modelMatrix); // S(1.2) * T(-ctr)
+  		mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.4,0.25,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
 
   		this.x = this.x - add_x;
 
-   		var translation = vec3.create();
-   		vec3.set (translation, this.x, this.y, this.z);
+  		//translate city
+	  	var temp1 = mat4.create();
+	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(this.x,this.y,0)), this.modelMatrix);
 
-   		mat4.translate(this.modelMatrix, this.modelMatrix, translation);
    		var self = this;
    		if(dest[0]==this.x)
    		{
@@ -170,5 +172,6 @@ class SpaceShip {
    			setTimeout(function(){self.animate_spaceship(add_x,dest);}, 150);
    		}
    }
+
 }
 

@@ -355,9 +355,9 @@ function loadModels() {
     scenes.push(missile_launcher2);
     scenes.push(missile_launcher3);
     
-   launch_missile();
+    launch_missile();
 
-    //launch_spaceship();
+    launch_spaceship();
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -367,32 +367,19 @@ function loadModels() {
 function launch_missile()
 {
 
-    //add audio
-
-   //  var missileAudio = document.createElement('audio');
-   //  var audio_source = document.createElement('source');
-   //  audio_source.src = "/Users/pjain12/Downloads/gameOver.wav";
-   //  missileAudio.appendChild(audio_source);
-   // // missileAudio.play();
-
-
-    //destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
-    for(var i=0; i<2; i++){
+    for(var i=0; i<1; i++){
         var dest = scenes[getRandomScene(0,scenes.length)];
         // var dest = vec3.fromValues(-1.5, 0, 0);
         if(dest.visible==true){
             attack_missile = new AttackMissile(gl);
-            
-            //val12 = destinations[Math.floor(Math.random()*destinations.length)];
-           // dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
-           // src= vec3.fromValues(generateRandomValue(-10,10), 10, 0);
-            src= vec3.fromValues(generateRandomValue(-2.5, 2.5), 4, 0);
+
+            src= vec3.fromValues(generateRandomValue(0, 2.5), 4, 0);
 
             attack_missile.load_missile(src[0], src[1], src[2]);
 
             attack_missile_list.push(attack_missile);
-            var trans_x = (src[0]-dest.x)/30;
-            var trans_y = (src[1]-dest.y)/30;
+            var trans_x = (src[0]-dest.x)/35;
+            var trans_y = (src[1]-dest.y)/35;
             attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
         }
         else{
@@ -405,32 +392,12 @@ function launch_missile()
 
 function launch_spaceship()
 {
-
-    //add audio
-
-   //  var missileAudio = document.createElement('audio');
-   //  var audio_source = document.createElement('source');
-   //  audio_source.src = "/Users/pjain12/Downloads/gameOver.wav";
-   //  missileAudio.appendChild(audio_source);
-   // // missileAudio.play();
-
-
-    //destinations= [-10, -4, 0, 3, 7, 9.5, 15, 17, 23];
-        var spaceship = new SpaceShip(gl);
-        spaceship.load_spaceship(23, 30, 4);
-        attack_missile_list.push(spaceship);
-
-            
-        //val12 = destinations[Math.floor(Math.random()*destinations.length)];
-       // dest = vec3.fromValues(generateRandomValue(-80, 200), -3,4);
-        // var src= vec3.fromValues(23, 3, 4);
-        var dest = vec3.fromValues(-10,30,4);
-
-        // var trans_x = (src[0]-dest.x*10)/20;
-        // var trans_y = (src[1]-dest.y*10)/20;
-        spaceship.animate_spaceship(0.5,dest);
-
-        setTimeout(launch_spaceship, 9000);
+    var spaceship = new SpaceShip(gl);
+    spaceship.load_spaceship(3, 3.5, 0);
+    attack_missile_list.push(spaceship);
+    var dest = vec3.fromValues(-3,3.5,0);
+    spaceship.animate_spaceship(0.1,dest);
+    setTimeout(launch_spaceship, 9000);
 }
 //send 
 function send_defend_missile(event){
@@ -440,8 +407,8 @@ function send_defend_missile(event){
 
     console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
     //canvas_x = -2.25*val_x - 0.25;
-    canvas_x = -2.5*val_x;
-    canvas_y = -2*val_y + 2;
+    canvas_x = -2.7*val_x + 0.2;
+    canvas_y = -2.7*val_y + 2.;
     // canvas_y = -10*val_y + 10;
 
     console.log("********* canvas_x: " + canvas_x);
@@ -450,6 +417,7 @@ function send_defend_missile(event){
     defend_missile = new DefendMissile(gl);
     dest= vec3.fromValues(canvas_x, canvas_y, 0);
 
+    scenes[8].visible==false;
     if(canvas_x>1.5 && scenes[8].visible==true)
     {
         console.log("********* inside if *******");
