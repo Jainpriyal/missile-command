@@ -162,7 +162,8 @@ class AttackMissile {
 
 		var missileAudio = document.createElement('audio');
 	    var audio_source = document.createElement('source');
-	    audio_source.src = "/Users/pjain12/Downloads/squash.wav";
+	    //audio_source.src = "/Users/pjain12/Downloads/squash.wav";
+	    audio_source.src = "https://jainpriyal.github.io/sounds/explode.wav";
 	    missileAudio.appendChild(audio_source);
 
    		//translate city
@@ -173,7 +174,7 @@ class AttackMissile {
 	   	var val_x = this.x - scene.x;
 	   	var val_y = this.y - scene.y;
 	   	var distance = Math.sqrt(val_x * val_x + val_y * val_y);
-	   	if(distance<0.5 && this.visible==true)
+	   	if(distance<0.5 && this.visible==true && scene.visible == true)
 	   	{
 	   		console.log("******explosion this.x:" + this.x + "***** this.y:" + this.y);
 	   		var explode = new Explosion(this.gl);
@@ -183,10 +184,11 @@ class AttackMissile {
 	   		scene.visible = false;
 	   		this.visible = false;
 	   		missileAudio.play();
+	   		return;
 	   	}
 	   	else
 	   	{
-   			setTimeout(function(){self.animate_missile(add_x,add_y, scene,explode_list);}, 150);
+   			setTimeout(function(){self.animate_missile(add_x,add_y,scene,explode_list);}, 150);
 	   	}
    }
 }

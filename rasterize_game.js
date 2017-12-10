@@ -255,6 +255,16 @@ function setupWebGL() {
           imageContext.drawImage(bkgdImage,0,0,iw,ih,0,0,cw,ch);   
      } // end onload callback
     
+    var score = 10;
+    //imageContext.globalCompositeOperation = 'destination-out';
+    imageContext.font = "16px Arial";
+    imageContext.fillStyle = "#0095DD";
+    //imageContext.globalAlpha = 0.5
+    //imageContext.opacity = 0.3;
+    imageContext.background= "#ccc";
+    imageContext.fillText("Score: "+score, 8, 20);
+    imageContext.globalCompositeOperation = 'source-over';
+
      // create a webgl canvas and set it up
      var webGLCanvas = document.getElementById("myWebGLCanvas"); // create a webgl canvas
      webGLCanvas.width = window.innerWidth;
@@ -277,7 +287,8 @@ function setupWebGL() {
         var start_source = document.createElement('source');
         //modification
         //add game start audio
-        start_source.src = "/Users/pjain12/Downloads/gameOver.wav";
+        //start_source.src = "/Users/pjain12/Downloads/gameOver.wav";
+        start_source.src = "https://jainpriyal.github.io/sounds/start_game.wav";
         startAudio.appendChild(start_source);
         startAudio.play();
        }
@@ -357,7 +368,7 @@ function loadModels() {
     
     launch_missile();
 
-   // launch_spaceship();
+    launch_spaceship();
 
     var temp = vec3.create();
     viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
@@ -387,6 +398,26 @@ function launch_missile()
         }
     }
 
+    // for(var i=0; i<1; i++){
+    //     var dest = scenes[getRandomScene(0,scenes.length)];
+    //     // var dest = vec3.fromValues(-1.5, 0, 0);
+    //     if(dest.visible==true){
+    //         attack_missile = new AttackMissile(gl);
+
+    //         src= vec3.fromValues(generateRandomValue(-2.5, 0), 4, 0);
+
+    //         attack_missile.load_missile(src[0], src[1], src[2]);
+
+    //         attack_missile_list.push(attack_missile);
+    //         var trans_x = (src[0]-dest.x)/35;
+    //         var trans_y = (src[1]-dest.y)/35;
+    //         attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
+    //     }
+    //     else{
+    //         i=i-1;
+    //     }
+    // }
+
     setTimeout(launch_missile, 3000);
 }
 
@@ -408,9 +439,9 @@ function send_defend_missile(event){
     console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
     //canvas_x = -2.25*val_x - 0.25;
     //canvas_x = -2.7*val_x -0.2;
-    canvas_x = -3*val_x - 0.27;
+    canvas_x = -2.7*val_x +0.02;
     //canvas_x = 4*val_x;
-    canvas_y = -2.7*val_y + 2.4;
+    canvas_y = -2.5*val_y + 2.3;
     // canvas_y = -10*val_y + 10;
 
     console.log("********* canvas_x: " + canvas_x);
@@ -484,6 +515,10 @@ function send_defend_missile(event){
     console.log("********** src: *****" +src);
 
     // console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
+
+    var add_x = (src[0]-dest[0])/8;
+    var add_y = (src[1]-dest[1])/8;
+    console.log("************* add_x:"+ add_x + "********* add_y: "+ add_y);
     defend_missile.animate_defend_missile((src[0]-dest[0])/8 , (src[1]-dest[1])/8, dest, attack_missile_list, explode_list);
 }
 

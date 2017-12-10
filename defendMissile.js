@@ -163,7 +163,8 @@ class DefendMissile {
 
 		var missileAudio = document.createElement('audio');
 	    var audio_source = document.createElement('source');
-	    audio_source.src = "/Users/pjain12/Downloads/squash.wav";
+	    //audio_source.src = "/Users/pjain12/Downloads/squash.wav";
+	    audio_source.src = "https://jainpriyal.github.io/sounds/explode.wav";
 	    missileAudio.appendChild(audio_source);
 
    		var translation = vec3.create();
@@ -200,7 +201,7 @@ class DefendMissile {
    			this.visible = false;
 	   	}
 	   	else{
-   			setTimeout(function(){self.animate_defend_missile(add_x, add_y, dest, attack_missile_list, explode_list);}, 150);
+   			setTimeout(function(){self.animate_defend_missile(add_x, add_y, dest, attack_missile_list, explode_list);}, 40);
 	   	}
    }
 
