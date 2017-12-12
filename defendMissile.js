@@ -188,6 +188,9 @@ class DefendMissile {
    				var distance = Math.sqrt(val_x*val_x + val_y*val_y);
    				if(distance<0.5)
    				{
+   					   					var currScore = parseInt(document.getElementById("score_count").textContent);
+   					console.log("*************1111111116376432764723427 scoreeeee: " + currScore);
+   					document.getElementById("score_count").innerHTML =  currScore + 1;
    					var explode = new Explosion(this.gl);
    					explode.load_explosion(this.x, this.y, 0);
 					explode_list.push(explode);

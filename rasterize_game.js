@@ -30,7 +30,6 @@ var diffuseULoc; // where to put diffuse reflecivity for fragment shader
 var specularULoc; // where to put specular reflecivity for fragment shader
 var shininessULoc; // where to put specular exponent for fragment shader
 
-
 var alphaULoc; //location of alpha 
 var useTextureLoc //use texture
 
@@ -52,6 +51,9 @@ var missile_list = [];
 var scene_terrain = [];
 
 var explode_list = [];
+
+var gameOver = false;
+var visibile_scenes = 0;
 // ASSIGNMENT HELPER FUNCTIONS
 
 
@@ -255,16 +257,6 @@ function setupWebGL() {
           imageContext.drawImage(bkgdImage,0,0,iw,ih,0,0,cw,ch);   
      } // end onload callback
     
-    var score = 10;
-    //imageContext.globalCompositeOperation = 'destination-out';
-    imageContext.font = "16px Arial";
-    imageContext.fillStyle = "#0095DD";
-    //imageContext.globalAlpha = 0.5
-    //imageContext.opacity = 0.3;
-    imageContext.background= "#ccc";
-    imageContext.fillText("Score: "+score, 8, 20);
-    imageContext.globalCompositeOperation = 'source-over';
-
      // create a webgl canvas and set it up
      var webGLCanvas = document.getElementById("myWebGLCanvas"); // create a webgl canvas
      webGLCanvas.width = window.innerWidth;
@@ -315,6 +307,8 @@ function getRandomScene(min, max) {
 
 // read models in, load them into webgl buffers
 function loadModels() {
+
+    document.getElementById("score_count").innerHTML =  0;
 
     //??? anything with max value min value doubt
     var maxCorner = vec3.fromValues(-10, -10, -10); // bbox corner
@@ -377,6 +371,16 @@ function loadModels() {
 
 function launch_missile()
 {
+    if(gameOver == true){
+        return;
+    }
+
+    CurrentScore = parseInt(document.getElementById("score_count").textContent);
+    if(CurrentScore==5 || attack_missile_list.length>30){
+        gameOver = true;
+        game_won();
+        return;
+    }
 
     for(var i=0; i<1; i++){
         var dest = scenes[getRandomScene(0,scenes.length)];
@@ -391,7 +395,7 @@ function launch_missile()
             attack_missile_list.push(attack_missile);
             var trans_x = (src[0]-dest.x)/35;
             var trans_y = (src[1]-dest.y)/35;
-            attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
+            attack_missile.animate_missile(trans_x, trans_y, dest, explode_list, gameOver);
         }
         else{
             i=i-1;
@@ -417,12 +421,37 @@ function launch_missile()
     //         i=i-1;
     //     }
     // }
+    // if(attack_missile_list.length>30)
+    // {
+    //     gameOver = true;
+    //     game_won();
+    //     return;
+    //  }
 
     setTimeout(launch_missile, 3000);
 }
 
+function game_over()
+{
+    console.log("************ inside game over *********");
+    document.getElementById("game-over-panel").style.display = "block";
+    document.getElementById("game-over").innerHTML = "Game Over";
+    //setTimeout(function(){document.getElementById("control-panel-alert").style.display = "none";},2000);
+}
+
+function game_won()
+{
+    console.log("************ inside game won *********");
+    document.getElementById("game-over-panel").style.display = "block";
+    document.getElementById("game-over").innerHTML = "You Won!!!";
+    //setTimeout(function(){document.getElementById("control-panel-alert").style.display = "none";},2000);
+}
+
 function launch_spaceship()
 {
+    if(gameOver==true){
+        return;
+    }
     var spaceship = new SpaceShip(gl);
     spaceship.load_spaceship(3, 3.5, 0);
     attack_missile_list.push(spaceship);
@@ -433,10 +462,21 @@ function launch_spaceship()
 //send 
 function send_defend_missile(event){
 
+    CurrentScore = parseInt(document.getElementById("score_count").textContent);
+    if(CurrentScore==5){
+        gameOver = true;
+        game_won();
+        return;
+    }
+    if(gameOver == true)
+    {
+        return;
+    }
+
     val_x = (event.clientX/window.innerWidth)*2-1;
     val_y = (event.clientY/window.innerHeight)*2-1;
 
-    console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
+  //  console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
     //canvas_x = -2.25*val_x - 0.25;
     //canvas_x = -2.7*val_x -0.2;
     canvas_x = -2.7*val_x +0.02;
@@ -444,22 +484,22 @@ function send_defend_missile(event){
     canvas_y = -2.5*val_y + 2.3;
     // canvas_y = -10*val_y + 10;
 
-    console.log("********* canvas_x: " + canvas_x);
-    console.log("********* canvas_y: " + canvas_y);
+ //   console.log("********* canvas_x: " + canvas_x);
+  //  console.log("********* canvas_y: " + canvas_y);
 
-    if(scenes[6].visible==true){
+    if(scenes[6].visible==true && scenes[6].missiles>0){
         d1 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0),vec3.fromValues(-2,0,0));
     }
     else{
         d1 = 10000;
     }
-    if(scenes[7].visible==true){
+    if(scenes[7].visible==true && scenes[7].missiles>0){
         d2 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0),vec3.fromValues(0,0,0));
     }
     else{
         d2 = 10000;
     }
-    if(scenes[8].visible==true)
+    if(scenes[8].visible==true && scenes[8].missiles>0)
     {
         d3 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0), vec3.fromValues(2,0,0));
     }
@@ -470,17 +510,29 @@ function send_defend_missile(event){
 
     if(d1<d2 && d1<d3 && d1!=10000)
     {
+        //missile launcher1 is shooting
         src = vec3.fromValues(-2,0,0);
+        scenes[6].missiles = scenes[6].missiles -1;
+        document.getElementById("missile1").innerHTML = scenes[6].missiles;
     }
     else if(d2<d1 && d2<d3 && d2!=10000)
     {
+        //missile launcher2 is shooting
         src = vec3.fromValues(0,0,0);
+        scenes[7].missiles = scenes[7].missiles -1;
+        document.getElementById("missile2").innerHTML = scenes[7].missiles;
     }
     else if(d3<d1 && d3<d2 && d3!=10000)
     {
+        //missile launcher3 is shooting
         src = vec3.fromValues(2,0,0);
+        scenes[8].missiles = scenes[8].missiles -1;
+        document.getElementById("missile3").innerHTML = scenes[8].missiles;
     }
     else{
+        console.log("************* your game is over *************");
+        gameOver = true;
+        game_over();
         return;
     }
 
@@ -512,13 +564,13 @@ function send_defend_missile(event){
     // }
     defend_missile.load_missile(src[0], src[1], 0);
     defend_missile_list.push(defend_missile);
-    console.log("********** src: *****" +src);
+  //  console.log("********** src: *****" +src);
 
     // console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
 
     var add_x = (src[0]-dest[0])/8;
     var add_y = (src[1]-dest[1])/8;
-    console.log("************* add_x:"+ add_x + "********* add_y: "+ add_y);
+  //  console.log("************* add_x:"+ add_x + "********* add_y: "+ add_y);
     defend_missile.animate_defend_missile((src[0]-dest[0])/8 , (src[1]-dest[1])/8, dest, attack_missile_list, explode_list);
 }
 
@@ -679,10 +731,12 @@ function setupShaders() {
 
 // render the loaded model
 function renderModels() {
+  //  console.log("visibile_scenes *************"+ visibile_scenes);
+   // console.log("************* inside render models ***********" + scenes.length);
 
-    console.log("************* inside render models ***********" + scenes.length);
-
-    
+    if(gameOver==true)
+        return;
+    visibile_scenes =0;
     var pMatrix = mat4.create(); // projection matrix
     var vMatrix = mat4.create(); // view matrix
     var mMatrix = mat4.create(); // model matrix
@@ -775,6 +829,16 @@ function renderModels() {
             //gl.drawElements(gl.TRIANGLES, 3*terrain.triSetSizes,gl.UNSIGNED_SHORT,0); // render
             gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
         }
+        else{
+            visibile_scenes = visibile_scenes +1;
+        }
+    }
+
+    if(visibile_scenes==9)
+    {
+        gameOver = true;
+        game_over();
+        return;
     }
 
     //render attack missile

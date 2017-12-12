@@ -2,21 +2,126 @@
 <html>
   <head>
   <style>
-  #control-panel-score {
+
+  #control-panel1 {
     position: absolute;
     left: 0;
     bottom: 0;
-    background: #b7b7b7;
+    background: #000000;
     opacity: 1;
     width: 105px;
     height: 25px;
-    margin-top: 5px;
-    font-family : arial;
-    font-size: 18px;
     color: red;
     font-weight: bold;
-    transform: translateY(-90px) translateX(72px);
+    transform: translateY(-90px) translateX(1280px);
+  }
+
+  #control-panel2 {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: #000000;
+    opacity: 1;
+    width: 105px;
+    height: 25px;
+    color: red;
+    font-weight: bold;
+    transform: translateY(-90px) translateX(685px);
+  }
+
+  #control-panel3 {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: #000000;
+    opacity: 1;
+    width: 105px;
+    height: 25px;
+    color: red;
+    font-weight: bold;
+    transform: translateY(-90px) translateX(90px);
+  }
+
+  #control-panel-score {
+    position: absolute;
+        margin-top: 5px;
+    margin-left: 10px;
+    left: 0;
+    bottom: 0;
+    background: #bab8b8;
+    opacity: 0.7;
+    font-size: 25px;
+    width: 140px;
+    height: 35px;
+    color: red;
+    font-weight: bold;
+    transform: translateY(-650px) translateX(90px);
+  }
+
+    #score_count {
+    margin-top: 5px;
+    margin-left: 10px;
+    font-family : arial;
+    font-size: 25px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    transform: translateY(-2500px) translateX(90px);
     }
+
+  #missile1 {
+    margin-top: 5px;
+    font-family : arial;
+    font-size: 20px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    transform: translateY(-90px) translateX(1280px);
+    }
+
+  #missile2 {
+    margin-top: 5px;
+    font-family : arial;
+    font-size: 20px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    transform: translateY(-90px) translateX(685px);
+    }
+
+  #missile3 {
+    margin-top: 5px;
+    font-family : arial;
+    font-size: 20px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    transform: translateY(-90px) translateX(90px);
+    }
+
+    #game-over-panel {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: #ede8e8;
+    opacity: 0.5;
+    width: 350px;
+    height: 100px;
+    color: red;
+    font-weight: bold;
+    transform: translateY(-300px) translateX(580px);
+  }
+
+  #game-over {
+    font-family : arial;
+    font-size: 50px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    text-align: center;
+    transform: translateY(-300px) translateX(580px);
+    }
+
 
   </style>
 
@@ -53,8 +158,24 @@
     </span>
     <br>
 
+    <div id="control-panel1">
+    <label>Missiles:</label> <span id="missile1">15</span>
+    </div>
+
+    <div id="control-panel2">
+    <label>Missiles:</label> <span id="missile2">15</span>
+    </div>
+
+    <div id="control-panel3">
+    <label>Missiles:</label> <span id="missile3">15</span>
+    </div>
+
     <div id="control-panel-score">
-    <label>Missiles:</label> <span id="missiles">10</span>
+    <label>SCORE:</label> <span id="score_count">0</span>
+    </div>
+
+    <div id="game-over-panel" style="display: none">
+    <span id="game-over"></span>
     </div>
 
     </p>

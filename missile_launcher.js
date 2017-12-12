@@ -63,6 +63,8 @@ class MissileLauncher {
   //           [4,5,6],[6,7,4],
   //           [8,9,11],[11,10,9]];
 
+  		this.missiles =15;
+
 		this.modelMatrix = mat4.create();
 	}
 

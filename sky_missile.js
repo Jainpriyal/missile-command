@@ -150,8 +150,12 @@ class AttackMissile {
 
 
 	//add destination also
-   	animate_missile(add_x, add_y, scene, explode_list)
+   	animate_missile(add_x, add_y, scene, explode_list, gameOver)
    	{
+   		if(gameOver==true){
+   			return;
+   		}
+   		console.log("&&&&&&&&&&&&&&&& inside animate missile ************");
    		//animate missile only destroy city or missile launcher
    		this.modelMatrix = mat4.create();
    		var temp = mat4.create();
@@ -174,8 +178,9 @@ class AttackMissile {
 	   	var val_x = this.x - scene.x;
 	   	var val_y = this.y - scene.y;
 	   	var distance = Math.sqrt(val_x * val_x + val_y * val_y);
-	   	if(distance<0.5 && this.visible==true && scene.visible == true)
+	   	if(distance<0.5 && this.visible==true && scene.visible == true && gameOver==false)
 	   	{
+	   		console.log("************ inside if loop of animate missile ***************");
 	   		console.log("******explosion this.x:" + this.x + "***** this.y:" + this.y);
 	   		var explode = new Explosion(this.gl);
    			explode.load_explosion(this.x, this.y, 0);
@@ -188,7 +193,7 @@ class AttackMissile {
 	   	}
 	   	else
 	   	{
-   			setTimeout(function(){self.animate_missile(add_x,add_y,scene,explode_list);}, 150);
+   			setTimeout(function(){self.animate_missile(add_x,add_y,scene,explode_list, gameOver);}, 150);
 	   	}
    }
 }
