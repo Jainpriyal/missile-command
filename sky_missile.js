@@ -12,11 +12,7 @@ class AttackMissile {
 
 		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.6,0.6,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 0.6, "texture": "grass.jpg"};
 		this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
-		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
-
-		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
 		this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
-		//this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [0.8,0.9], [0,0], [0.8, 0]];
 		this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [1,1], [0,0], [1, 0]];
 
 		this.triangles = [[0,1,2],[0,2,3], 
@@ -40,7 +36,6 @@ class AttackMissile {
 	    {
 	        self.handleTexture();
 	    }
-	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
 	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/sky_missile4.jpg";
 	}
 
@@ -101,9 +96,6 @@ class AttackMissile {
 	  	var temp1 = mat4.create();
 	  	var translation = vec3.create();
 	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(x,y,z)), this.modelMatrix);
-		//vec3.set (translation, -7, 0.8, 4);
-		//vec3.set (translation, x, y, z);
-		//mat4.translate (this.modelMatrix, this.modelMatrix, translation);
 
 	    var numVerts = this.vertices.length; 
 	  	for (whichSetVert=0; whichSetVert<numVerts; whichSetVert++)
@@ -115,13 +107,7 @@ class AttackMissile {
 	    glVertices.push(vtxToAdd[0],vtxToAdd[1],vtxToAdd[2]); // put coords in set coord list
 	    glNormals.push(normToAdd[0],normToAdd[1],normToAdd[2]); // put normal in set coord list
 	    glUVs.push(uvToAdd[0], uvToAdd[1]);
-
-	    //vec3.max(maxCorner,maxCorner,vtxToAdd); // update world bounding box corner maxima
-	    //vec3.min(minCorner,minCorner,vtxToAdd); // update world bounding box corner minima
-	    //vec3.add(inputTriangles[whichSet].center,inputTriangles[whichSet].center,vtxToAdd); // add to ctr sum
 	    } // end for vertices in 
-
-	    //vec3.scale(inputTriangles[whichSet].center,inputTriangles[whichSet].center,1/numVerts); // avg ctr sum
 
 	    this.loadTexture();
 
@@ -136,7 +122,6 @@ class AttackMissile {
 	    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(glUVs), this.gl.STATIC_DRAW);
 	    
 	    this.triSetSizes = this.triangles.length; // number of tris in this set
-	 //   console.log("************** trisetsized: " + this.triSetSizes);
 
 	    for (whichSetTri=0; whichSetTri<this.triSetSizes; whichSetTri++) {
 			triToAdd = this.triangles[whichSetTri]; // get tri to add
@@ -155,7 +140,6 @@ class AttackMissile {
    		if(gameOver==true){
    			return;
    		}
-   		console.log("&&&&&&&&&&&&&&&& inside animate missile ************");
    		//animate missile only destroy city or missile launcher
    		this.modelMatrix = mat4.create();
    		var temp = mat4.create();
@@ -166,7 +150,6 @@ class AttackMissile {
 
 		var missileAudio = document.createElement('audio');
 	    var audio_source = document.createElement('source');
-	    //audio_source.src = "/Users/pjain12/Downloads/squash.wav";
 	    audio_source.src = "https://jainpriyal.github.io/sounds/explode.wav";
 	    missileAudio.appendChild(audio_source);
 
@@ -180,8 +163,6 @@ class AttackMissile {
 	   	var distance = Math.sqrt(val_x * val_x + val_y * val_y);
 	   	if(distance<0.5 && this.visible==true && scene.visible == true && gameOver==false)
 	   	{
-	   		console.log("************ inside if loop of animate missile ***************");
-	   		console.log("******explosion this.x:" + this.x + "***** this.y:" + this.y);
 	   		var explode = new Explosion(this.gl);
    			explode.load_explosion(this.x, this.y, 0);
 			explode_list.push(explode);
@@ -197,4 +178,3 @@ class AttackMissile {
 	   	}
    }
 }
-

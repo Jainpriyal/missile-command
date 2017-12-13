@@ -1,4 +1,5 @@
 /* GLOBAL CONSTANTS AND VARIABLES */
+/* I have taken program 3 base code given by professor to design this game
 
 /* assignment specific globals */
 const INPUT_TRIANGLES_URL = "https://ncsucgclass.github.io/prog3/triangles.json"; // triangles file loc
@@ -54,6 +55,7 @@ var explode_list = [];
 
 var gameOver = false;
 var visibile_scenes = 0;
+var level =1;
 // ASSIGNMENT HELPER FUNCTIONS
 
 
@@ -277,9 +279,8 @@ function setupWebGL() {
          //setup game start audio
         var startAudio = document.createElement('audio');
         var start_source = document.createElement('source');
-        //modification
+
         //add game start audio
-        //start_source.src = "/Users/pjain12/Downloads/gameOver.wav";
         start_source.src = "https://jainpriyal.github.io/sounds/start_game.wav";
         startAudio.appendChild(start_source);
         startAudio.play();
@@ -310,7 +311,6 @@ function loadModels() {
 
     document.getElementById("score_count").innerHTML =  0;
 
-    //??? anything with max value min value doubt
     var maxCorner = vec3.fromValues(-10, -10, -10); // bbox corner
     var minCorner = vec3.fromValues(10, 10, 10); // other corner
 
@@ -361,12 +361,10 @@ function loadModels() {
     scenes.push(missile_launcher3);
     
     launch_missile();
-
     launch_spaceship();
-
     var temp = vec3.create();
-    viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
 
+    viewDelta = vec3.length(vec3.subtract(temp,maxCorner,minCorner)) / 100; // set global 
 } // end load models
 
 function launch_missile()
@@ -376,13 +374,21 @@ function launch_missile()
     }
 
     CurrentScore = parseInt(document.getElementById("score_count").textContent);
-    if(CurrentScore==5 || attack_missile_list.length>30){
-        gameOver = true;
-        game_won();
-        return;
+    if(CurrentScore==20)
+    {
+        if(level>=3){
+            gameOver = true;
+            game_won();
+        }
+        else{
+           	level = level +1;
+           	game_level();
+          	restart_game();  
+        }        
+        //return;
     }
 
-    for(var i=0; i<1; i++){
+    for(var i=0; i<level; i++){
         var dest = scenes[getRandomScene(0,scenes.length)];
         // var dest = vec3.fromValues(-1.5, 0, 0);
         if(dest.visible==true){
@@ -401,52 +407,30 @@ function launch_missile()
             i=i-1;
         }
     }
-
-    // for(var i=0; i<1; i++){
-    //     var dest = scenes[getRandomScene(0,scenes.length)];
-    //     // var dest = vec3.fromValues(-1.5, 0, 0);
-    //     if(dest.visible==true){
-    //         attack_missile = new AttackMissile(gl);
-
-    //         src= vec3.fromValues(generateRandomValue(-2.5, 0), 4, 0);
-
-    //         attack_missile.load_missile(src[0], src[1], src[2]);
-
-    //         attack_missile_list.push(attack_missile);
-    //         var trans_x = (src[0]-dest.x)/35;
-    //         var trans_y = (src[1]-dest.y)/35;
-    //         attack_missile.animate_missile(trans_x, trans_y, dest, explode_list);
-    //     }
-    //     else{
-    //         i=i-1;
-    //     }
-    // }
-    // if(attack_missile_list.length>30)
-    // {
-    //     gameOver = true;
-    //     game_won();
-    //     return;
-    //  }
-
     setTimeout(launch_missile, 3000);
 }
 
-function game_over()
+function game_over(mssg)
 {
     console.log("************ inside game over *********");
     document.getElementById("game-over-panel").style.display = "block";
-    document.getElementById("game-over").innerHTML = "Game Over";
-    //setTimeout(function(){document.getElementById("control-panel-alert").style.display = "none";},2000);
+    document.getElementById("game-over").innerHTML = "Game Over!! " + mssg;
+    //setTimeout(function(){document.getElementById("game-over-panel").style.display = "none";},2000);
+}
+
+function game_level()
+{
+    console.log("************ inside game won *********");
+    document.getElementById("game-over-panel").style.display = "block";
+    document.getElementById("game-over").innerHTML = "Entering level: "+ level;
+    setTimeout(function(){document.getElementById("game-over-panel").style.display = "none";},1200);
 }
 
 function game_won()
 {
-    console.log("************ inside game won *********");
     document.getElementById("game-over-panel").style.display = "block";
-    document.getElementById("game-over").innerHTML = "You Won!!!";
-    //setTimeout(function(){document.getElementById("control-panel-alert").style.display = "none";},2000);
+    document.getElementById("game-over").innerHTML = "Congratulations !! You won";    
 }
-
 function launch_spaceship()
 {
     if(gameOver==true){
@@ -463,29 +447,25 @@ function launch_spaceship()
 function send_defend_missile(event){
 
     CurrentScore = parseInt(document.getElementById("score_count").textContent);
-    if(CurrentScore==5){
-        gameOver = true;
-        game_won();
-        return;
-    }
-    if(gameOver == true)
-    {
-        return;
+
+    if(CurrentScore==20){
+        if(level>=3){
+            gameOver = true;
+            game_won();
+        }
+        else{
+                level = level +1;
+
+            game_level();
+          restart_game();  
+        }        
     }
 
     val_x = (event.clientX/window.innerWidth)*2-1;
     val_y = (event.clientY/window.innerHeight)*2-1;
 
-  //  console.log("************** canvas val_X: " + val_x + "**** val_y: " + val_y);
-    //canvas_x = -2.25*val_x - 0.25;
-    //canvas_x = -2.7*val_x -0.2;
     canvas_x = -2.7*val_x +0.02;
-    //canvas_x = 4*val_x;
     canvas_y = -2.5*val_y + 2.3;
-    // canvas_y = -10*val_y + 10;
-
- //   console.log("********* canvas_x: " + canvas_x);
-  //  console.log("********* canvas_y: " + canvas_y);
 
     if(scenes[6].visible==true && scenes[6].missiles>0){
         d1 = vec3.distance(vec3.fromValues(canvas_x, canvas_y, 0),vec3.fromValues(-2,0,0));
@@ -530,47 +510,19 @@ function send_defend_missile(event){
         document.getElementById("missile3").innerHTML = scenes[8].missiles;
     }
     else{
-        console.log("************* your game is over *************");
         gameOver = true;
-        game_over();
+        game_over("you lost all missiles");
         return;
     }
 
     defend_missile = new DefendMissile(gl);
     dest= vec3.fromValues(canvas_x, canvas_y, 0);
 
-    //scenes[8].visible==false;
-
-    //src = vec3.fromValues(0, 0, 0);
-    // if(canvas_x>1.5 && scenes[8].visible==true)
-    // {
-    //     console.log("********* inside if *******");
-    //     src = vec3.fromValues(2, 0, 0);
-    // }
-    // else if(canvas_x>0.5 && scenes[7].visible==true)
-    // {
-    //     console.log("********* inside else if *********");
-    //     src = vec3.fromValues(0, 0, 0);
-
-    // }
-    // else if(scenes[6].visible==true){
-    //             console.log("********* inside last else if *********");
-    //     src = vec3.fromValues(-2, 0, 0);
-
-    // }
-    // else{
-    //             console.log("********* inside else *********");
-    //     return;
-    // }
     defend_missile.load_missile(src[0], src[1], 0);
     defend_missile_list.push(defend_missile);
-  //  console.log("********** src: *****" +src);
-
-    // console.log("******** sending defend missile: src: " + src + "***** dest: " + dest);
 
     var add_x = (src[0]-dest[0])/8;
     var add_y = (src[1]-dest[1])/8;
-  //  console.log("************* add_x:"+ add_x + "********* add_y: "+ add_y);
     defend_missile.animate_defend_missile((src[0]-dest[0])/8 , (src[1]-dest[1])/8, dest, attack_missile_list, explode_list);
 }
 
@@ -729,6 +681,38 @@ function setupShaders() {
 } // end setup shaders
 
 
+function restart_game(){
+    for(var i=0; i<6; i++)
+    {
+        scenes[i].visible = true;
+    }
+    scenes[6].visible = true;
+    scenes[6].missiles = 15;
+
+    scenes[7].visible = true;
+    scenes[7].missiles = 15;
+
+    scenes[8].visible = true;
+    scenes[8].missiles = 15;
+
+    //attack_missile_list = [];
+    //defend_missile_list = [];
+    //gameOver = false;
+    reset_score();
+}
+
+function reset_score(){
+
+    //reset score
+    document.getElementById("score_count").innerHTML =  0;
+    document.getElementById("level").innerHTML = level;
+
+    //reset missiles launched from missile command
+    document.getElementById("missile1").innerHTML = scenes[6].missiles;
+    document.getElementById("missile2").innerHTML = scenes[7].missiles;
+    document.getElementById("missile3").innerHTML = scenes[8].missiles;
+}
+
 // render the loaded model
 function renderModels() {
   //  console.log("visibile_scenes *************"+ visibile_scenes);
@@ -748,16 +732,10 @@ function renderModels() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear frame/depth buffers
     
     // set up projection and view
-    // mat4.fromScaling(hMatrix,vec3.fromValues(-1,1,1)); // create handedness matrix
     mat4.perspective(pMatrix,0.3*Math.PI,1,0.1,100); // create projection matrix
     mat4.lookAt(vMatrix,Eye,Center,Up); // create view matrix
     mat4.multiply(pvMatrix,pvMatrix,pMatrix); // projection
     mat4.multiply(pvMatrix,pvMatrix,vMatrix); // projection * view
-
-    // render each triangle set
-    //var currSet; // the tri set and its material properties
-    //for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) {
-       // currSet = inputTriangles[whichTriSet];
 
     currscene = scene_terrain[0];
     mat4.multiply(pvmMatrix,pvMatrix,currscene.modelMatrix); // project * view * model
@@ -837,7 +815,7 @@ function renderModels() {
     if(visibile_scenes==9)
     {
         gameOver = true;
-        game_over();
+        game_over("");
         return;
     }
 
@@ -960,15 +938,11 @@ function renderModels() {
             gl.drawElements(gl.TRIANGLES, 3*currscene.triSetSizes,gl.UNSIGNED_SHORT,0); // render
         }
     }
-
-
-
 } // end render model
 
 /* MAIN -- HERE is where execution begins after window load */
 function main() {
   setupWebGL(); // set up the webGL environment
-
   loadModels(); // load in the models from tri file
   setupShaders(); // setup the webGL shaders
   renderModels(); // draw the triangles using webGL 

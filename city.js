@@ -13,12 +13,7 @@ class City {
 
 		this.material = {"ambient": [0.7,0.7,0.7], "diffuse": [0.4,0.4,0.4], "specular": [0.3,0.3,0.3], "n":17, "alpha": 1, "texture": "grass.jpg"};
 		this.vertices = [[-0.5,0.5,0.5], [0.5,0.5,0.5], [0.5,-0.5,0.5], [-0.5,-0.5,0.5], [0.5,0.5,-0.5], [-0.5,0.5,-0.5], [0.5,-0.5,-0.5], [-0.5,-0.5,-0.5]];
-		//this.vertices = [[-1,1,0.5], [1,1,0.5], [1,0,0.5], [-1,0,0.5], [1,1,-0.5], [-1,1,-0.5], [1,0,-0.5], [-1,0,-0.5]];
-
-
-		//this.vertices = [[0,1,0.5], [1,1,0.5], [1,-1,0.5], [0,-1,0.5], [1,1,-0.5], [0,1,-0.5], [1,-1,-0.5], [0,-1,-0.5]];
 		this.normals =  [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],];
-		//this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [0.8,0.9], [0,0], [0.8, 0]];
 		this.uvs = [[0,1], [1,1], [1,0], [0,0], [0,1], [1,1], [0,0], [1, 0]];
 
 		this.triangles = [[0,1,2],[0,2,3], 
@@ -27,26 +22,6 @@ class City {
 						  [5,4,1],[5,1,0],
 						  [5,0,3], [5,3,7],
 						  [4,1,2],[4,1,6]];
-
-		// this.vertices=[[-0.5,-0.5,-0.5],[0.5,-0.5,-0.5],[0.5,-0.5,0.5],[-0.5,-0.5,0.5],
-  //           [-0.5,0.5,-0.5],[0.5,0.5,-0.5],[0.5,0.5,0.5],[-0.5,0.5,0.5],
-  //           [-0.5,0.51,-0.5],[0.5,0.51,-0.5],[0.5,0.51,0.5],[-0.5,0.51,0.5]];
-
-  //           this.normals=[[0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
-  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1],
-  //           [0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1]];
-
-  //           this.uvs=[[1,0], [0.76,0], [1,0], [0.76,0],
-  //           [1,0.48], [0.76,0.48], [1,0.48], [0.76,0.48],
-  //           [1,0], [0.76,0], [0.76,0.48], [1,0.48]];
-
-  //           this.triangles=[[0,1,4],[4,5,1],
-  //           [1,2,5],[5,6,2],
-  //           [2,3,6],[6,7,3],
-  //           [3,0,7],[4,7,0],
-  //           [4,5,6],[6,7,4],
-  //           [8,9,11],[11,10,9]];
-
 		this.modelMatrix = mat4.create();
 	}
 
@@ -60,7 +35,6 @@ class City {
 	    {
 	        self.handleTexture();
 	    }
-	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
 	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/city_trans1.png";
 	}
 
@@ -116,11 +90,6 @@ class City {
 	  	var temp = mat4.create();
 	  	mat4.multiply(this.modelMatrix,mat4.fromScaling(temp,vec3.fromValues(0.2,0.4,0.2)),this.modelMatrix); // S(1.2) * T(-ctr)
 
-	 //  	//translate city
-	 //  	var translation = vec3.create();
-		// vec3.set (translation, x,(y+0.4),z);
-		// mat4.translate (this.modelMatrix, this.modelMatrix, translation);
-
 		var temp1 = mat4.create();
 	  	var translation = vec3.create();
 	  	mat4.multiply(this.modelMatrix, mat4.fromTranslation(temp1, vec3.fromValues(x,y+0.2,z)), this.modelMatrix);
@@ -135,13 +104,7 @@ class City {
 		    glVertices.push(vtxToAdd[0],vtxToAdd[1],vtxToAdd[2]); // put coords in set coord list
 		    glNormals.push(normToAdd[0],normToAdd[1],normToAdd[2]); // put normal in set coord list
 		    glUVs.push(uvToAdd[0], uvToAdd[1]);
-
-		    //vec3.max(maxCorner,maxCorner,vtxToAdd); // update world bounding box corner maxima
-		    //vec3.min(minCorner,minCorner,vtxToAdd); // update world bounding box corner minima
-		    //vec3.add(inputTriangles[whichSet].center,inputTriangles[whichSet].center,vtxToAdd); // add to ctr sum
 	    } // end for vertices in 
-
-	    //vec3.scale(inputTriangles[whichSet].center,inputTriangles[whichSet].center,1/numVerts); // avg ctr sum
 
 	    this.loadTexture();
 
@@ -167,4 +130,3 @@ class City {
 		this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(glTriangles),gl.STATIC_DRAW); // data in
 	   } // end for each triangle set 
 	}
-

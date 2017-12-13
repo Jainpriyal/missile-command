@@ -55,7 +55,7 @@
     height: 35px;
     color: red;
     font-weight: bold;
-    transform: translateY(-650px) translateX(90px);
+    transform: translateY(-650px) translateX(10px);
   }
 
     #score_count {
@@ -66,7 +66,34 @@
     color: red;
     opacity: 1;
     font-weight: bold;
-    transform: translateY(-2500px) translateX(90px);
+    transform: translateY(-2500px) translateX(10px);
+    }
+
+    #control-panel-level {
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 10px;
+    left: 0;
+    bottom: 0;
+    background: #bab8b8;
+    opacity: 0.7;
+    font-size: 25px;
+    width: 140px;
+    height: 35px;
+    color: red;
+    font-weight: bold;
+    transform: translateY(-700px) translateX(10px);
+  }
+
+    #level {
+    margin-top: 5px;
+    margin-left: 10px;
+    font-family : arial;
+    font-size: 25px;
+    color: red;
+    opacity: 1;
+    font-weight: bold;
+    transform: translateY(-1500px) translateX(90px);
     }
 
   #missile1 {
@@ -105,7 +132,7 @@
     bottom: 0;
     background: #ede8e8;
     opacity: 0.5;
-    width: 350px;
+    width: 400px;
     height: 100px;
     color: red;
     font-weight: bold;
@@ -114,7 +141,7 @@
 
   #game-over {
     font-family : arial;
-    font-size: 50px;
+    font-size: 30px;
     color: red;
     opacity: 1;
     font-weight: bold;
@@ -172,6 +199,10 @@
 
     <div id="control-panel-score">
     <label>SCORE:</label> <span id="score_count">0</span>
+    </div>
+
+    <div id="control-panel-level">
+    <label>LEVEL:</label> <span id="level">1</span>
     </div>
 
     <div id="game-over-panel" style="display: none">

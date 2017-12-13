@@ -15,7 +15,6 @@ class Terrain {
 		this.normals = [[0, 0, -1],[0, 0, -1],[0, 0, -1],[0, 0, -1]];
 		this.uvs = [[0,0], [0,1], [1,1], [1,0]];
 		this.triangles = [[0,1,2],[2,3,0]];
-
 		this.modelMatrix = mat4.create();
 	}
 
@@ -29,7 +28,6 @@ class Terrain {
 	    {
 	        self.handleTexture();
 	    }
-	    //triangleTexture[triangleSet].image.src = "https://ncsucgclass.github.io/prog3/" + textureLocation;
 	    this.triangleTexture.image.src = "https://jainpriyal.github.io/textures/grass.jpg";
 	}
 
@@ -85,13 +83,7 @@ load_model(){
     glVertices.push(vtxToAdd[0],vtxToAdd[1],vtxToAdd[2]); // put coords in set coord list
     glNormals.push(normToAdd[0],normToAdd[1],normToAdd[2]); // put normal in set coord list
     glUVs.push(uvToAdd[0], uvToAdd[1]);
-
-    //vec3.max(maxCorner,maxCorner,vtxToAdd); // update world bounding box corner maxima
-    //vec3.min(minCorner,minCorner,vtxToAdd); // update world bounding box corner minima
-    //vec3.add(inputTriangles[whichSet].center,inputTriangles[whichSet].center,vtxToAdd); // add to ctr sum
     } // end for vertices in 
-
-    //vec3.scale(inputTriangles[whichSet].center,inputTriangles[whichSet].center,1/numVerts); // avg ctr sum
 
     this.loadTexture();
 
@@ -116,4 +108,3 @@ load_model(){
 	this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(glTriangles),gl.STATIC_DRAW); // data in
    } // end for each triangle set 
 }
-
