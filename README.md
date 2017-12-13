@@ -22,3 +22,8 @@ Video Link in You tube:
 ------------------------
 https://www.youtube.com/watch?v=Ivht5MyrA30&feature=youtu.be
 
+References:
+--------------
+1) https://developer.mozilla.org/en-US/docs/Games/Techniques/Audio_for_Web_Games
+2) http://learningwebgl.com/blog/?page_id=1217
+3) https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL
